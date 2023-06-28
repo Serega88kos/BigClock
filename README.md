@@ -32,8 +32,7 @@
 
 ### Схемы
 
-
-
+https://github.com/Serega88kos/BigClock/tree/main/schemes
 
 ### Возможности
 
