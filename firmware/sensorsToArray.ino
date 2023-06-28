@@ -1,6 +1,6 @@
 //////////// Функции опросов датчиков и их преобразования
 void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран
-  if (wifi.DOT_TEMP == 1) {
+  if (DOT_TEMP == 1) {
     leds[NUM_LEDS] = 0x000000;
   }
   FtempH = (bmp280.readTemperature()) + other.cor_tempH;
@@ -24,7 +24,7 @@ void TempStreetToArray() {  // вывод уличной температуры 
   tempS = FtempS;
   //Serial.println((String)tempS + " | " + FtempS);
   Dots(!Dot);
-  if (wifi.DOT_TEMP == 1) {
+  if (DOT_TEMP == 1) {
     if (clck.new_god) {
       leds[NUM_LEDS] = ColorTable[rand() % NUM_COLORS - 1];
     } else {
@@ -57,7 +57,7 @@ void TempStreetToArray() {  // вывод уличной температуры 
 }
 
 void PressToArray() {  // вывод давления на экран с датчика BMP/BME280
-  if (wifi.DOT_TEMP == 1) {
+  if (DOT_TEMP == 1) {
     leds[NUM_LEDS] = 0x000000;
   }
   float pressure = bmp280.readPressure();
@@ -79,7 +79,7 @@ void PressToArray() {  // вывод давления на экран с дат�
 }
 
 void HumToArray() {  // вывод влажности с датчика BME280 на экран
-  if (wifi.DOT_TEMP == 1) {
+  if (DOT_TEMP == 1) {
     leds[NUM_LEDS] = 0x000000;
   }
   if (clck.htu21d) {

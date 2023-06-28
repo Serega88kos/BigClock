@@ -28,7 +28,7 @@ GyverHTU21D htu;
 MicroDS18B20<ONE_SENSORS_DS> sensors;
 #include <Forecaster.h>
 Forecaster cond;
-#define NUM_LEDS (wifi.LEDS_IN_SEGMENT * 28 + wifi.DOTS_NUM + wifi.DOT_TEMP) // вычисляем кол-во светодиодов
+#define NUM_LEDS (LEDS_IN_SEGMENT * 28 + DOTS_NUM + DOT_TEMP) // вычисляем кол-во светодиодов
 CRGB leds [NUM_LEDS];                                           // определение СД ленты
 
 GHcolor color1(0, 0, 255);
@@ -75,10 +75,10 @@ void setup() {
   bmp280.begin();
   FastLED.addLeds<WS2812B, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);  // подключение ленты
   FastLED.setMaxPowerInVoltsAndMilliamps(5, milliamp);
-  segment_4 = (NUM_LEDS - wifi.DOT_TEMP) - wifi.LEDS_IN_SEGMENT * 7;
-  segment_3 = (NUM_LEDS - wifi.DOT_TEMP) - wifi.LEDS_IN_SEGMENT * 14;
-  segment_2 = (NUM_LEDS - wifi.DOT_TEMP) - wifi.LEDS_IN_SEGMENT * 21 - wifi.DOTS_NUM;
-  segment_1 = (NUM_LEDS - wifi.DOT_TEMP) - wifi.LEDS_IN_SEGMENT * 28 - wifi.DOTS_NUM;
+  segment_4 = (NUM_LEDS - DOT_TEMP) - LEDS_IN_SEGMENT * 7;
+  segment_3 = (NUM_LEDS - DOT_TEMP) - LEDS_IN_SEGMENT * 14;
+  segment_2 = (NUM_LEDS - DOT_TEMP) - LEDS_IN_SEGMENT * 21 - DOTS_NUM;
+  segment_1 = (NUM_LEDS - DOT_TEMP) - LEDS_IN_SEGMENT * 28 - DOTS_NUM;
   wifi_connected();
   rtcCheck();
   if (dfp.status_kuku)DFPlayer_setup();
@@ -115,7 +115,7 @@ void loop() {
   if (millis() - tmr >= 30 * 60 * 1000ul) {
     tmr = millis();
     // каждые 30 минут передаём текущее давление (Па) и температуру (С) с датчика
-    cond.addP(bmp280.readPressure(), FtempS);
+    cond.addPmm(Fpres, FtempS);
     pogoda = cond.getCast();
     // getCast() возвращает текущий прогноз от 0 до 10
     // 0 - хорошая погода, 10 и выше - шторм/ливень

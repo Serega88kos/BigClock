@@ -1,7 +1,7 @@
 //////////// Настройка точек
 void Dots(boolean Dot_On) {
-  for (int i = 0; i < wifi.DOTS_NUM; i++) {
-    leds[(wifi.LEDS_IN_SEGMENT * 14) + i] = (Dot_On) ? ledColor : CRGB(0, 0, 0);
+  for (int i = 0; i < DOTS_NUM; i++) {
+    leds[(LEDS_IN_SEGMENT * 14) + i] = (Dot_On) ? ledColor : CRGB(0, 0, 0);
   }
 }
 
@@ -31,7 +31,7 @@ uint8_t digits[] = {
 /////////////////////////////////////////////
 void Digit(uint8_t digit, uint8_t cursor) {  // функция отображения символов
   for (uint8_t mask = 0b01000000; mask > 0; mask = mask >> 1) {
-    for (uint8_t i = 0; i < wifi.LEDS_IN_SEGMENT; i++) {
+    for (uint8_t i = 0; i < LEDS_IN_SEGMENT; i++) {
       if (clck.new_god) {
         leds[cursor] = (digit & mask) ? ColorTable[rand() % NUM_COLORS - 1] : CRGB(0, 0, 0);
       } else {
