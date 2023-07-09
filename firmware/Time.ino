@@ -37,15 +37,15 @@ void TimeToArray() {    // вывод времени на экран
       cursor -= DOTS_NUM;
     }
     if ((i == 4) & (digit == 0)) {
-      if (!clck.symbol) {               // проверка, включен ли ноль
-        Digit(digits[12], cursor);  // если впереди ноль, то выключаем его, например 01:23 будет как 1:23
+      if (!clck.symbol) {             // проверка, включен ли ноль
+        Digit(digits[12], cursor);    // если впереди ноль, то выключаем его, например 01:23 будет как 1:23
       } else {
-        Digit(digits[0], cursor);  // иначе будет как 01:23
+        Digit(digits[0], cursor);    // иначе будет как 01:23
       }
     } else {
       Digit(digits[digit], cursor);  // иначе показываем символ
     }
-    if (i == clck.change_color) {  // как часто менять цвет
+    if (i == clck.change_color) {    // как часто менять цвет
       if (digit != last_digit) {
         change_color_flag = true;
         last_digit = digit;

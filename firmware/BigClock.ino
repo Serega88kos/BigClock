@@ -11,7 +11,7 @@ GyverNTP ntp(3);
 #include <WiFiClient.h>
 #define GH_NO_MQTT      // MQTT
 #include <GyverHub.h>
-GyverHub hub("MyDevices", "WEB Clock", "");
+GyverHub hub("MyDevices", "BigClock", "");
 #include <microDS3231.h>
 MicroDS3231 rtc;
 #include <SoftwareSerial.h>
@@ -26,10 +26,9 @@ GyverBME280 bmp280;
 GyverHTU21D htu;
 #include <microDS18B20.h>
 MicroDS18B20<ONE_SENSORS_DS> sensors;
-#include <Forecaster.h>
-Forecaster cond;
+
 #define NUM_LEDS (LEDS_IN_SEGMENT * 28 + DOTS_NUM + DOT_TEMP) // вычисляем кол-во светодиодов
-CRGB leds [NUM_LEDS];                                           // определение СД ленты
+CRGB leds [NUM_LEDS];                                         // определение СД ленты
 
 GHcolor color1(0, 0, 255);
 
@@ -53,7 +52,6 @@ uint16_t pres;
 uint8_t hum, hour, minute, second, day, month;
 int year;
 uint8_t tab = 0;
-int pogoda;
 
 byte segment_1, segment_2, segment_3, segment_4;
 GHcolor col(clck.r, clck.g, clck.b);
@@ -82,8 +80,6 @@ void setup() {
   wifi_connected();
   rtcCheck();
   if (dfp.status_kuku)DFPlayer_setup();
-  hub.setVersion(Version_Firmware);
-  cond.setH(110);
 }
 /////////////////////////////////////////////
 void loop() {
@@ -95,10 +91,9 @@ void loop() {
   wifi_.tick();  clock_.tick(); other_.tick();
   narod_.tick(); dfp_.tick();   modes_.tick();
   color1_.tick();
-  hub.sendUpdate("n1,new_bright,pogoda");
+  hub.sendUpdate("n1,new_bright");
   hub.tick();
   ntp.tick();
-  //body();
   mod();
   if (dfp.status_kuku) {
     kuku_tick();
@@ -109,16 +104,5 @@ void loop() {
       timing = millis();
       narodMonitor();
     }
-  }
-  // таймер на 30 минут
-  static uint32_t tmr;
-  if (millis() - tmr >= 30 * 60 * 1000ul) {
-    tmr = millis();
-    // каждые 30 минут передаём текущее давление (Па) и температуру (С) с датчика
-    cond.addPmm(Fpres, FtempS);
-    pogoda = cond.getCast();
-    // getCast() возвращает текущий прогноз от 0 до 10
-    // 0 - хорошая погода, 10 и выше - шторм/ливень
-    //Serial.println(cond.getCast());
   }
 }

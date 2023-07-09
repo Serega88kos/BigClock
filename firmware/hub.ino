@@ -136,8 +136,7 @@ void build() {
         flag_monitor |= hub.Switch(&narod.nm_tempH, F("Комнатная"));
         flag_monitor |= hub.Switch(&narod.nm_tempS, F("Уличная"));
         flag_monitor |= hub.Switch(&narod.nm_pres, F("Давление"));
-        flag_monitor |= hub.Switch(&narod.nm_hum, F("Влажность"));
-        hub.Label_(F("pogoda"), String(pogoda), F("Погода 0-10"), GH_DEFAULT, 20);
+        flag_monitor |= hub.Switch(&narod.nm_hum, F("Влажность"));       
         if (flag_monitor) {
           narod_.update();
         }
@@ -146,6 +145,7 @@ void build() {
 
     case 4:
       {
+      
         hub.Title(F("Настройки DFP"));
         bool flag_dfp = 0;
         bool flag_test_dfp = 0;
@@ -178,7 +178,6 @@ int convertMods() {
   int s;
   for (int i = 0; i < modes.counter; i++) {
     s = modes.myMods[i];
-    Serial.println(s);
   }
   return s;
 }
