@@ -80,6 +80,7 @@ void setup() {
   wifi_connected();
   rtcCheck();
   if (dfp.status_kuku)DFPlayer_setup();
+  hub.setVersion(VF);
 }
 /////////////////////////////////////////////
 void loop() {
