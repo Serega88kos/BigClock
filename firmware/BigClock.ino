@@ -10,6 +10,7 @@
 GyverNTP ntp(3);
 #include <WiFiClient.h>
 #define GH_NO_MQTT      // MQTT
+#define GH_INCLUDE_PORTAL
 #include <GyverHub.h>
 GyverHub hub("MyDevices", "BigClock 1.2", "");
 #include <microDS3231.h>
