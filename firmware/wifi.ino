@@ -1,7 +1,7 @@
 //////////// Функция WiFi и RTC
 void wifi_connected() {
   WiFi.mode(WIFI_STA);
-  byte tries = 30;
+  byte tries = 60;
   WiFi.begin(wifi.ssid, wifi.pass);
   while (--tries && WiFi.status() != WL_CONNECTED) {
     Serial.print F(".");
