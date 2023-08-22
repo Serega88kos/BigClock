@@ -1,5 +1,5 @@
 //////////// Настройка точек
-void Dots(boolean Dot_On) {
+void Dots(bool Dot_On) {
   for (int i = 0; i < DOTS_NUM; i++) {
     leds[(LEDS_IN_SEGMENT * 14) + i] = (Dot_On) ? ledColor : CRGB(0, 0, 0);
   }

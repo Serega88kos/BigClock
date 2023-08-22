@@ -1,7 +1,7 @@
 //////////// Функции опросов датчиков и их преобразования
 void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран
   if (DOT_TEMP == 1) {
-    leds[NUM_LEDS] = 0x000000;
+    leds[NUM_LEDS - 1] = CRGB(0, 0, 0);
   }
   FtempH = (bmp280.readTemperature()) + other.cor_tempH;
   tempH = FtempH;
@@ -26,9 +26,9 @@ void TempStreetToArray() {  // вывод уличной температуры 
   Dots(!Dot);
   if (DOT_TEMP == 1) {
     if (clck.new_god) {
-      leds[NUM_LEDS] = ColorTable[rand() % NUM_COLORS - 1];
+      leds[NUM_LEDS - 1] = ColorTable[rand() % NUM_COLORS - 1];
     } else {
-      leds[NUM_LEDS] = ledColor;
+      leds[NUM_LEDS - 1] = ledColor;
     }
     int a = FtempS * 10;              //25.43 -> 254
     int digit = abs(a % 10);          //254 -> 4
@@ -58,7 +58,7 @@ void TempStreetToArray() {  // вывод уличной температуры 
 
 void PressToArray() {  // вывод давления на экран с датчика BMP/BME280
   if (DOT_TEMP == 1) {
-    leds[NUM_LEDS] = 0x000000;
+    leds[NUM_LEDS - 1] = CRGB(0, 0, 0);
   }
   float pressure = bmp280.readPressure();
   Fpres = pressureToMmHg(pressure) + other.cor_pres;
@@ -80,7 +80,7 @@ void PressToArray() {  // вывод давления на экран с дат�
 
 void HumToArray() {  // вывод влажности с датчика BME280 на экран
   if (DOT_TEMP == 1) {
-    leds[NUM_LEDS] = 0x000000;
+    leds[NUM_LEDS - 1] = CRGB(0, 0, 0);
   }
   if (clck.htu21d) {
     hum = htu.getHumidity() + other.cor_hum;

@@ -12,7 +12,7 @@ GyverNTP ntp(3);
 #define GH_NO_MQTT      // MQTT
 #define GH_INCLUDE_PORTAL
 #include <GyverHub.h>
-GyverHub hub("MyDevices", "BigClock 1.2", "");
+GyverHub hub("MyDevices", "BigClock 1.3", "");
 #include <microDS3231.h>
 MicroDS3231 rtc;
 #include <SoftwareSerial.h>
@@ -85,7 +85,6 @@ void setup() {
 }
 /////////////////////////////////////////////
 void loop() {
-  //timeToDotsOLD();
   if (clck.htu21d) {
     htu.readTick();
   }
