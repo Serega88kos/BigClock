@@ -1,5 +1,17 @@
 {
-  "version": "1.3",
-  "notes": "исправлены точки, багфиксы",
-  "about": "Большие часы на ESP8266 для СД ленты с мониторингом"
+  "name": "BigClock",
+  "about": "Большие часы на ESP8266 для СД ленты с мониторингом",
+  "version": "2.0",
+  "notes": "Большое обновление, много исправлений и улучшений",
+  "builds": [
+    {
+      "chipFamily": "ESP8266",
+      "parts": [
+        {
+          "path": "https://github.com/Serega88kos/BigClock/blob/main/bin/firmware.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
 }
