@@ -1,41 +1,50 @@
 void mod() {
   static uint32_t tmr;
   static byte mode;
-  if ((millis() - tmr) >= (modes.myTime[mode] * 1000)) {
-    tmr = millis();
-    if (++mode >= modes.counter ) mode = 0;
-  }
-  if (modes.myMods[mode] == 0) {
+  if (o.night_mode && o.night_time && (hour >= o.start_night && hour < o.stop_night)) {
     TimeToArray();
-    BrightnessCheck();
+    Brightness();
     timeToDots();
+  } else {
+
+    if ((millis() - tmr) >= (c.myTime[mode] * 1000)) {
+      tmr = millis();
+      if (++mode >= c.counter) mode = 0;
+    }
+    switch (c.myMods[mode]) {
+      case 1:
+        TempToArray();
+        break;
+      case 2:
+        TempStreetToArray();
+        break;
+      case 3:
+        PressToArray();
+        break;
+      case 4:
+        HumToArray();
+        break;
+      case 5:
+        DateToArray();
+        break;
+      default:
+        TimeToArray();
+        Brightness();
+        timeToDots();
+        break;
+    }
   }
-  else if (modes.myMods[mode] == 1)
-    TempToArray();
-  else if (modes.myMods[mode] == 2)
-    TempStreetToArray();
-  else if (modes.myMods[mode] == 3)
-    PressToArray();
-  else if (modes.myMods[mode] == 4)
-    HumToArray();
-  else if (modes.myMods[mode] == 5)
-    DateToArray();
+
   static uint32_t Ftiming;
-  if (millis() - Ftiming > 100) {
+  if (millis() - Ftiming > 500) {
     Ftiming = millis();
     FastLED.show();
   }
 }
 
 void timeToDots() {
-  static unsigned int t_sec;
   static bool showDot = false;
-  static uint32_t tmr = millis();
-  if ((millis() - tmr) < ((clck.type_sec) ? 500 : 1000)) return;
-  tmr = millis();
-  showDot = !showDot;
-  if (showDot)
-    Dots(true);
-  else
-    Dots(false);
+  static gh::Timer timer(c.mode_sec ? 500 : 1000);
+  if (timer) { showDot = !showDot; }
+  showDot ? Dots(Dot) : Dots(!Dot);
 }

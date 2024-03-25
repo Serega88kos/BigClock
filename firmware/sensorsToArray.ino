@@ -1,67 +1,84 @@
 //////////// Функции опросов датчиков и их преобразования
-void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран
-  if (DOT_TEMP == 1) {
-    leds[NUM_LEDS - 1] = CRGB(0, 0, 0);
+void ReadingSensors() {
+  FtempH = (bmp280.readTemperature()) + o.cor_tempH;
+  float pressure = bmp280.readPressure();
+  Fpres = pressureToMmHg(pressure) + o.cor_pres;
+  if (c.htu21d) {
+    hum = htu.getHumidity() + o.cor_hum;
+  } else {
+    hum = bmp280.readHumidity() + o.cor_hum;
   }
-  FtempH = (bmp280.readTemperature()) + other.cor_tempH;
+  sensors.requestTemp();
+  if (sensors.readTemp())
+    FtempS = sensors.getTemp() + o.cor_tempS;
+}
+
+void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран
+  if (c.DOT_TEMP == 1) {
+    leds[NUM_LEDS - 1] = CRGB::Black;
+  }
   tempH = FtempH;
   //Serial.println((String)tempH + " | " + FtempH);
   Dots(!Dot);
-  Digit(digits[10], segment_4);  // символ градуса
+  DigitTempH(digits[10], segment_4);  // символ градуса
   int digit = abs(tempH % 10);
-  Digit(digits[digit], segment_3);
+  DigitTempH(digits[digit], segment_3);
   digit = tempH / 10;
-  if (digit == 0) Digit(digits[12], segment_2);  // если впереди ноль, то выключаем его
-  else
-    Digit(digits[digit], segment_2);  // иначе показываем как есть
-  Digit(digits[12], segment_1);       // отключаем 1 сегмент
+  if (digit == 0) {
+    DigitTempH(digits[12], segment_2);  // если впереди ноль, то выключаем его
+  } else {
+    DigitTempH(digits[digit], segment_2);  // иначе показываем как есть
+    DigitTempH(digits[12], segment_1);     // отключаем 1 сегмент
+  }
 }
 
 void TempStreetToArray() {  // вывод уличной температуры на экран
-  sensors.requestTemp();    // опрос датчика уличной температуры
-  if (sensors.readTemp())
-    FtempS = sensors.getTemp() + other.cor_tempS;  // чтение уличной температуры с датчика 0, аналогично следующий будет 1
   tempS = FtempS;
   //Serial.println((String)tempS + " | " + FtempS);
   Dots(!Dot);
-  if (DOT_TEMP == 1) {
-    if (clck.new_god) {
-      leds[NUM_LEDS - 1] = ColorTable[rand() % NUM_COLORS - 1];
-    } else {
+  if (c.DOT_TEMP == 1) {
+    if (c.modeColor == 1) {
+      leds[NUM_LEDS - 1] = ColorTable[rand() % 16];
+    } else if (c.modeColor == 0) {
       leds[NUM_LEDS - 1] = ledColor;
     }
-    int a = FtempS * 10;              //25.43 -> 254
-    int digit = abs(a % 10);          //254 -> 4
-    Digit(digits[digit], segment_4);  // символ градуса
-    digit = abs((a % 100) / 10);      // 254 -> 54 -> 5
-    Digit(digits[digit], segment_3);
-    digit = abs(a / 100);                          // 254 -> 2
-    if (digit == 0) Digit(digits[12], segment_2);  // если впереди ноль, то выключаем его
+    int a = FtempS * 10;                   //25.43 -> 254
+    int digit = abs(a % 10);               //254 -> 4
+    DigitTempS(digits[digit], segment_4);  // символ градуса
+    digit = abs((a % 100) / 10);           // 254 -> 54 -> 5
+    DigitTempS(digits[digit], segment_3);
+    digit = abs(a / 100);                               // 254 -> 2
+    if (digit == 0) DigitTempS(digits[12], segment_2);  // если впереди ноль, то выключаем его
     else
-      Digit(digits[digit], segment_2);              // иначе показываем как есть
-    if (tempS <= -1) Digit(digits[13], segment_1);  // если < или = -1, то показываем -
+      DigitTempS(digits[digit], segment_2);              // иначе показываем как есть
+    if (tempS <= -1) DigitTempS(digits[13], segment_1);  // если < или = -1, то показываем -
     else
-      Digit(digits[12], segment_1);  // иначе выключаем 1 сегмент
+      DigitTempS(digits[12], segment_1);  // иначе выключаем 1 сегмент
   } else {
-    Digit(digits[10], segment_4);  // символ градуса
+    DigitTempS(digits[10], segment_4);  // символ градуса
     int digit = abs(tempS % 10);
-    Digit(digits[digit], segment_3);
+    DigitTempS(digits[digit], segment_3);
     digit = abs(tempS / 10);
-    if (digit == 0) Digit(digits[12], segment_2);  // если впереди ноль, то выключаем его
+    if (digit == 0) DigitTempS(digits[12], segment_2);  // если впереди ноль, то выключаем его
     else
-      Digit(digits[digit], segment_2);              // иначе показываем как есть
-    if (tempS <= -1) Digit(digits[13], segment_1);  // если < или = -1, то показываем -
-    else
-      Digit(digits[12], segment_1);  // иначе выключаем 1 сегмент
+      DigitTempS(digits[digit], segment_2);  // иначе показываем как есть
+    if (tempS <= -1) {                       // если < или = -1
+      if (tempS <= -10) {                    // если < или = -10
+        DigitTempS(digits[13], segment_1);   // то показываем - на 1 сегменте
+      } else {                               // если от -9 до -1
+        DigitTempS(digits[12], segment_1);   // то показываем выключаем 1 сегмент
+        DigitTempS(digits[13], segment_2);   // и показываем - на 2 сегменте
+      }
+    } else {
+      DigitTempS(digits[12], segment_1);  // иначе выключаем 1 сегмент
+    }
   }
 }
 
 void PressToArray() {  // вывод давления на экран с датчика BMP/BME280
-  if (DOT_TEMP == 1) {
-    leds[NUM_LEDS - 1] = CRGB(0, 0, 0);
+  if (c.DOT_TEMP == 1) {
+    leds[NUM_LEDS - 1] = CRGB::Black;
   }
-  float pressure = bmp280.readPressure();
-  Fpres = pressureToMmHg(pressure) + other.cor_pres;
   pres = Fpres;
   //Serial.println(pres);
   Dots(!Dot);
@@ -71,7 +88,7 @@ void PressToArray() {  // вывод давления на экран с дат�
   Digit(digits[digit], segment_3);
   digit = pres / 100;
   Digit(digits[digit], segment_2);
-  if (clck.prs) {
+  if (c.prs) {
     Digit(digits[14], segment_1);  // показываем символ P
   } else {
     Digit(digits[12], segment_1);  // отключаем первый сегмент
@@ -79,17 +96,11 @@ void PressToArray() {  // вывод давления на экран с дат�
 }
 
 void HumToArray() {  // вывод влажности с датчика BME280 на экран
-  if (DOT_TEMP == 1) {
-    leds[NUM_LEDS - 1] = CRGB(0, 0, 0);
+  if (c.DOT_TEMP == 1) {
+    leds[NUM_LEDS - 1] = CRGB::Black;
   }
-  if (clck.htu21d) {
-    hum = htu.getHumidity() + other.cor_hum;
-  } else {
-    hum = bmp280.readHumidity() + other.cor_hum;
-  }
-  //Serial.println(hum);
   Dots(!Dot);
-  if (clck.hmd) {
+  if (c.hmd) {
     Digit(digits[16], segment_4);  // символ %  включен
     Digit(digits[15], segment_3);
   } else {

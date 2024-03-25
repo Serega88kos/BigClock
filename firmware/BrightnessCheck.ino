@@ -1,32 +1,26 @@
 //////////// функция освещенности
-void BrightnessCheck() {
-  static uint32_t last_br = millis();
-  if ((millis() - last_br) < other.brg) return;
-  last_br = millis();
+void Brightness() {
+  static gh::Timer timer(o.brg * 1000);  // как часто проверять изменение по датчику освещенности в сек
 
-  if (other.night_mode && (hour >= other.start_night && hour <= other.stop_night)) {
-    LEDS.setBrightness(other.night_bright);
-  } else {
+  if (timer) {
 
-    if (other.auto_bright) {                                                                  // если включена автояркость
-      if (millis() - bright_timer > 100) {                                                // каждые 100 мс
-        bright_timer = millis();                                                          // сбросить таймер
-        if (other.type_brg) {                                                                 // тип датчика цифра
-          if (other.min_max) {                                                                // проверка инверсии
-            new_bright = map(digitalRead(BRI_PIN), 0, 1023, other.min_bright, other.max_bright);  // считать показания с фоторезистора, перевести диапазон прямой
-          } else {
-            new_bright = map(digitalRead(BRI_PIN), 0, 1023, other.max_bright, other.min_bright);  // считать показания с фоторезистора, перевести диапазон обратный
-          }
-        } else {                                                                         // иначе тип датчика аналог
-          if (other.min_max) {                                                               // проверка инверсии
-            new_bright = map(analogRead(BRI_PIN), 0, 1023, other.min_bright, other.max_bright);  // считать показания с фоторезистора, перевести диапазон прямой
-          } else {
-            new_bright = map(analogRead(BRI_PIN), 0, 1023, other.max_bright, other.min_bright);  // считать показания с фоторезистора, перевести диапазон обратный
-          }
+    if ((hour >= o.start_night && hour < o.stop_night) && (o.night_mode)) {
+      FastLED.setBrightness(o.night_brg);  // яркость ночного режима
+      ledColor = ColorTable[o.NightColor];
+    } else {
+
+      if (o.auto_brg) {  // если включена автояркость
+
+        if (o.type_brg) {  // тип датчика цифра
+          new_brg = o.min_max ? map(digitalRead(BRG_PIN), 0, 1023, o.min_brg, o.max_brg) : map(digitalRead(BRG_PIN), 0, 1023, o.max_brg, o.min_brg);
+        } else {  // иначе аналог
+          new_brg = o.min_max ? map(analogRead(BRG_PIN), 0, 1023, o.min_brg, o.max_brg) : map(analogRead(BRG_PIN), 0, 1023, o.max_brg, o.min_brg);
         }
-        LEDS.setBrightness(new_bright);  // устанавливаем яркость
+        FastLED.setBrightness(new_brg);  // устанавливаем яркость
+        ledColor = ColorTable[c.Ledcolor];
       }
-    } else LEDS.setBrightness(other.min_bright);  // если автояркость выключена, то в расчете минимальная
 
+      if (!o.auto_brg) FastLED.setBrightness(o.min_brg);
+    }
   }
 }

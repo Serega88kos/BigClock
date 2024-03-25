@@ -2,7 +2,8 @@
 void wifi_connected() {
   WiFi.mode(WIFI_STA);
   byte tries = 60;
-  WiFi.begin(wifi.ssid, wifi.pass);
+  WiFi.hostname("BigClock");
+  WiFi.begin(w.ssid, w.pass);
   while (--tries && WiFi.status() != WL_CONNECTED) {
     Serial.print F(".");
     int digit = tries % 10;
@@ -36,11 +37,9 @@ void wifi_connected() {
     Serial.println F("WiFi запущен");
     Serial.print("IP адрес: ");
     Serial.println(WiFi.localIP());
-    ntp.setGMT(wifi.gmt);
-    ntp.setHost(wifi.host);
-    //ntp.setPeriod(3600);
+    ntp.setGMT(w.gmt);
+    ntp.setHost(w.host);
     ntp.begin();
-    //ntp.updateNow();
     hub.onBuild(build);     // подключаем билдер
     hub.begin();            // запускаем систему
   }

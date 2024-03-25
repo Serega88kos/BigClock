@@ -2,7 +2,7 @@
 byte test = 0;
 void rtcCheck() {
 
-  if (clck.rtc_check) {
+  if (c.rtc_check) {
     WiFi.setAutoReconnect(true);
     ntp.updateNow();
     uint32_t ntpTime = ntp.unix();
@@ -33,7 +33,7 @@ void rtcCheck() {
     }
   }
 
-  if (!clck.rtc_check) {
+  if (!c.rtc_check) {
     WiFi.setAutoReconnect(true);
     ntp.updateNow();
     uint32_t ntpTime = ntp.unix();

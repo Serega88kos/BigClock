@@ -1,19 +1,18 @@
 //////////// функция для народного мониторинга
 void narodMonitor() {  
   WiFi.setAutoReconnect(true);
-
   String buf = "#" + WiFi.macAddress();
   // добавление и удаление датчиков по шаблону
-  if (narod.nm_tempH) {
+  if (nm.tempH) {
     buf = buf + "\n#T1#" + FtempH;
   }
-  if (narod.nm_tempS) {
+  if (nm.tempS) {
     buf = buf + "\n#T2#" + FtempS;
   }
-  if (narod.nm_pres) {
+  if (nm.pres) {
     buf = buf + "\n#T3#" + Fpres;
   }
-  if (narod.nm_hum) {
+  if (nm.hum) {
     buf = buf + "\n#T4#" + hum;
   }
   buf = buf + "\n##";
