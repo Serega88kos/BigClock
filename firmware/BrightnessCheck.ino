@@ -17,7 +17,7 @@ void Brightness() {
           new_brg = o.min_max ? map(analogRead(BRG_PIN), 0, 1023, o.min_brg, o.max_brg) : map(analogRead(BRG_PIN), 0, 1023, o.max_brg, o.min_brg);
         }
         FastLED.setBrightness(new_brg);  // устанавливаем яркость
-        if (c.change_color = 0) ledColor = ColorTable[c.Ledcolor];
+        if (c.change_color == 0) ledColor = ColorTable[c.Ledcolor];
       }
 
       if (!o.auto_brg) FastLED.setBrightness(o.min_brg);
