@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define VF "Serega88kos/BigClock@2.1"  // версия прошивки
+#define VF "Serega88kos/BigClock@2.2"  // версия прошивки
 //////////// НАСТРОЙКИ ////////////
 //   питание платы от БП не выше 5В
 //   DS3231        SDA=>D2 SCL=>D1 питание с 5В БП или с 3.3В
