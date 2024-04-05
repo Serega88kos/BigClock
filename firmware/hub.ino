@@ -9,6 +9,7 @@ void build(gh::Builder& b) {
       {
         bool flag_w = 0;
         b.Title(F("Настройки WiFi")).fontSize(20);
+        b.Title(F(VF)).fontSize(20);
         {
           gh::Row r(b);
           b.Input(w.ssid).label("SSID").attach(&flag_w);
@@ -75,7 +76,12 @@ void build(gh::Builder& b) {
           b.SwitchIcon(&c.prs).label("Символ давления").fontSize(15).attach(&flag_c);
           b.SwitchIcon(&c.hmd).label("Символ влажности").fontSize(15).attach(&flag_c);
           b.SwitchIcon(&c.symbol).label("Первый ноль в часах").fontSize(15).attach(&flag_c);
+        }
+        {
+          gh::Row r(b);
           b.SwitchIcon(&c.mode_sec).label("Режим секунд").fontSize(15).attach(&flag_c);
+          b.SwitchIcon(&c.dotDate).label("Точка даты").fontSize(15).attach(&flag_c);
+          b.SwitchIcon(&c.dotInv).label("Сменить точку").fontSize(15).attach(&flag_c);
         }
         if (flag_c) {
           _clock.update();

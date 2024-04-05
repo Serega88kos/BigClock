@@ -114,7 +114,16 @@ void HumToArray() {  // вывод влажности с датчика BME280 �
 }
 
 void DateToArray() {
-  Dots(!Dot);
+  if (!c.dotDate) {
+    Dots(!Dot);
+  }
+  if (c.dotDate) {
+    if (c.dotInv) {
+      leds[c.LEDS_IN_SEGMENT * 14] = ledColor;
+    } else {
+      leds[c.LEDS_IN_SEGMENT * 14 + 1] = ledColor;
+    }
+  }
   int digit = day % 10;
   Digit(digits[digit], segment_2);  // 2 сегмент
   digit = day / 10;

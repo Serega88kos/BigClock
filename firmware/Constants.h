@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define VF "Serega88kos/BigClock@2.0"  // версия прошивки
+#define VF "Serega88kos/BigClock@2.1"  // версия прошивки
 //////////// НАСТРОЙКИ ////////////
 //   питание платы от БП не выше 5В
 //   DS3231        SDA=>D2 SCL=>D1 питание с 5В БП или с 3.3В
@@ -49,6 +49,8 @@ struct Clck {
   uint8_t LEDS_IN_SEGMENT = 4;            // кол-во СД в сегменте
   uint8_t DOTS_NUM = 2;                   // кол-во СД в точках
   uint8_t DOT_TEMP = 0;                   // только если есть дополнительный последний СД для точки десятичной температуры = 1
+  bool dotDate = 0;                       // точка для даты
+  bool dotInv = 0;                        // сменить точку
 };
 Clck c;
 
