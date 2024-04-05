@@ -9,7 +9,6 @@ void build(gh::Builder& b) {
       {
         bool flag_w = 0;
         b.Title(F("Настройки WiFi")).fontSize(20);
-        b.Title(F(VF)).fontSize(20);
         {
           gh::Row r(b);
           b.Input(w.ssid).label("SSID").attach(&flag_w);
