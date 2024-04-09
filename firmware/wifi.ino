@@ -42,5 +42,6 @@ void wifi_connected() {
     ntp.begin();
     hub.onBuild(build);     // подключаем билдер
     hub.begin();            // запускаем систему
+    rtcCheck();
   }
 }

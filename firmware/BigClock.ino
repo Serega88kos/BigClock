@@ -81,7 +81,6 @@ void setup() {
   segment_2 = (NUM_LEDS - c.DOT_TEMP) - c.LEDS_IN_SEGMENT * 21 - c.DOTS_NUM;
   segment_1 = (NUM_LEDS - c.DOT_TEMP) - c.LEDS_IN_SEGMENT * 28 - c.DOTS_NUM;
   wifi_connected();
-  rtcCheck();
   if (dfp.status_kuku) DFPlayer_setup();
   hub.onBuild(build);  // подключаем билдер
   hub.setVersion(VF);
