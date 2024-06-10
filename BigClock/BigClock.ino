@@ -94,9 +94,13 @@ void loop() {
   _other.tick();
   _narod.tick();
   _dfp.tick();
+  hub.sendUpdate("FtempH");
   hub.sendUpdate("n1");
   hub.sendUpdate("n2");
   hub.sendUpdate("new_bright");
+  hub.sendUpdate("FtempS");
+  hub.sendUpdate("pres");
+  hub.sendUpdate("hum");
   hub.tick();
   ntp.tick();
   Brightness();
