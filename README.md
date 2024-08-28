@@ -4,6 +4,20 @@
 перенесенный на платформу GyverHub.
 - Прошивку можно обновлять автоматически.
 
+### Ипользуемые библиотеки
+
+* Менеджер библиотек
+    * FileData
+    * GyverNTP
+    * GyverDS3231
+    * GyverBME280
+    * GyverHTU21D
+    * GyverDS18
+    * FastLED
+ * Вручную
+    * DFPlayer https://github.com/enjoyneering/DFPlayer
+    * GyverHub https://github.com/GyverLibs/GyverHub
+
 ### Конфигурация 
 
 * тип ленты GRB
