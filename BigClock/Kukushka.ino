@@ -15,6 +15,7 @@ void kuku_tick() {
       if (minute == 59 && flag_kuku == 0) {
         flag_kuku = 1;
       }
+      mp3.setVolume(dfp.grom_mp3);
       Vremy();
       Utro();
       Vecher();
@@ -67,7 +68,7 @@ void DFPlayer_setup() {
 
   Serial.println("Инициализация DFPlayedfp... (может занять 3~5 секунд)");                                    //для отладки
   mp3Serial.begin(MP3_SERIAL_SPEED, SWSERIAL_8N1, MP3_RX_PIN, MP3_TX_PIN, false, MP3_SERIAL_BUFFER_SIZE, 0);  //false=сигнал не инвертирован, 0=размер буфера ISR/RX (общий с последовательным буфером TX)
-  mp3.begin(mp3Serial, MP3_SERIAL_TIMEOUT, board, false);                                             //"DFPLAYER_HW_247A" см. ПРИМЕЧАНИЕ, false = нет обратной связи от модуля после команды
+  mp3.begin(mp3Serial, MP3_SERIAL_TIMEOUT, board, false);                                                     //"DFPLAYER_HW_247A" см. ПРИМЕЧАНИЕ, false = нет обратной связи от модуля после команды
   mp3.stop();                                                                                                 //если плеер работал во время перезагрузки ESP8266
   mp3.reset();                                                                                                //сбросить все настройки по умолчанию
   mp3.setSource(2);                                                                                           //1=USB-диск, 2=TF-карта, 3=Aux, 4=спящий режим, 5=NOR Flash

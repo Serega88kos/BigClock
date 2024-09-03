@@ -1,23 +1,23 @@
 //////////// Функция времени
 int GetTime() {
   if (c.rtc_check) {
-    DateTime now = rtc.getTime();
+    Datime now = rtc.getTime();
     hour = now.hour;
     minute = now.minute;
     second = now.second;
-    day = now.date;
+    day = now.day;
     month = now.month;
     year = now.year;
     //Serial.println((String)hour + ":" + minute + ":" + second);
     //Serial.println((String)day + "." + month + "." + year);
     return (hour * 100 + minute);
   } else {
-    hour = ntp.hour();
-    minute = ntp.minute();
-    second = ntp.second();
-    day = ntp.day();
-    month = ntp.month();
-    year = ntp.year();
+    hour = NTP.hour();
+    minute = NTP.minute();
+    second = NTP.second();
+    day = NTP.day();
+    month = NTP.month();
+    year = NTP.year();
     //Serial.println((String)hour + ":" + minute + ":" + second);
     return (hour * 100 + minute);
   }

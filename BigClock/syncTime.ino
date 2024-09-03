@@ -1,24 +1,22 @@
 //////////// Функция синхронизации времени
 byte test = 0;
 void rtcCheck() {
-
   if (c.rtc_check) {
     WiFi.setAutoReconnect(true);
-    ntp.updateNow();
-    uint32_t ntpTime = ntp.unix();
+    NTP.updateNow();
+    uint32_t ntpTime = NTP.getUnix();
     Serial.println(ntpTime);
-    Serial.println(ntp.timeString());
-    Serial.println(ntp.dateString());
+    Serial.println(NTP.toString());
     if (ntpTime > 1609459200) {
       Serial.println("");
       Serial.println("Время записано!");
-      DateTime now;
-      now.hour = ntp.hour();
-      now.minute = ntp.minute();
-      now.second = ntp.second();
-      now.date = ntp.day();
-      now.month = ntp.month();
-      now.year = ntp.year();
+      Datime now;
+      now.hour = NTP.hour();
+      now.minute = NTP.minute();
+      now.second = NTP.second();
+      now.day = NTP.day();
+      now.month = NTP.month();
+      now.year = NTP.year();
       rtc.setTime(now);
     } else {
       Serial.println("");
@@ -35,11 +33,10 @@ void rtcCheck() {
 
   if (!c.rtc_check) {
     WiFi.setAutoReconnect(true);
-    ntp.updateNow();
-    uint32_t ntpTime = ntp.unix();
-    Serial.println(ntp.unix());
-    Serial.println(ntp.timeString());
-    Serial.println(ntp.dateString());
+    NTP.updateNow();
+    uint32_t ntpTime = NTP.getUnix();
+    Serial.println(NTP.getUnix());
+    Serial.println(NTP.toString());
     if (ntpTime > 1609459200) {
       Serial.println("");
       Serial.println("Время верно!");

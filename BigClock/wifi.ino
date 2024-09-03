@@ -37,9 +37,9 @@ void wifi_connected() {
     Serial.println F("WiFi запущен");
     Serial.print("IP адрес: ");
     Serial.println(WiFi.localIP());
-    ntp.setGMT(w.gmt);
-    ntp.setHost(w.host);
-    ntp.begin();
+    NTP.setGMT(w.gmt);
+    NTP.setHost(w.host);
+    NTP.begin();
     hub.onBuild(build);     // подключаем билдер
     hub.begin();            // запускаем систему
     rtcCheck();

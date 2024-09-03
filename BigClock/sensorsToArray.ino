@@ -8,9 +8,11 @@ void ReadingSensors() {
   } else {
     hum = bmp280.readHumidity() + o.cor_hum;
   }
-  sensors.requestTemp();
-  if (sensors.readTemp())
-    FtempS = sensors.getTemp() + o.cor_tempS;
+  ds.requestTemp();
+  if (ds.waitReady()) {
+    if (ds.readTemp())
+      FtempS = ds.getTemp() + o.cor_tempS;
+  }
 }
 
 void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран

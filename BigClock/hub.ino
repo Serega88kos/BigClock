@@ -33,12 +33,10 @@ void build(gh::Builder& b) {
         {
           gh::Row r(b);
           if (!c.rtc_check) {
-            b.Label_("n1", ntp.timeString()).noLabel().fontSize(20).size(3);
-            b.Label_("n2", ntp.dateString()).noLabel().fontSize(20).size(3);
+            b.Label_("time", NTP.toString()).noLabel().fontSize(20).size(3);
           }
           if (c.rtc_check) {
-            b.Label_("n1", rtc.getTimeString()).noLabel().fontSize(20).size(3);
-            b.Label_("n2", rtc.getDateString()).noLabel().fontSize(20).size(3);
+            b.Label_("time", rtc.toString()).noLabel().fontSize(20).size(3);
           }
           b.Button_("btnn").icon("f0e2").noLabel().size(1).fontSize(20).attach(&flag_sync);
           if (flag_sync) {
@@ -51,7 +49,6 @@ void build(gh::Builder& b) {
           b.Spinner_("lis", &c.LEDS_IN_SEGMENT).label(F("СД в сегменте")).size(2).fontSize(15).range(1, 6, 1).attach(&flag_c);
           b.Spinner_("dn", &c.DOTS_NUM).label(F("СД точек")).size(2).fontSize(15).range(2, 8, 2).attach(&flag_c);
           b.Spinner_("dt", &c.DOT_TEMP).label(F("СД десятки температуры")).size(2).fontSize(15).range(0, 1, 1).attach(&flag_c);
-          //b.Button_("rst").icon("f0e2").label("Применить").size(1).fontSize(15).attach(&flag_rst);
         }
         if (flag_rst) {
           ESP.restart();
@@ -167,7 +164,7 @@ void build(gh::Builder& b) {
         {
           gh::Row r(b);
           b.SwitchIcon(&nm.Enable).label(F("Включить")).fontSize(15).size(1).attach(&flag_m);
-          b.HTML(F("<a href='https://narodmon.ru/?invite=asm'>narodmon.ru</a>")).noLabel().fontSize(15).size(2);        
+          b.HTML(F("<a href='https://narodmon.ru/?invite=asm'>narodmon.ru</a>")).noLabel().fontSize(15).size(2);
           b.Input(&nm.delay).label(F("Интервал, в сек.")).size(1).attach(&flag_m);
         }
 

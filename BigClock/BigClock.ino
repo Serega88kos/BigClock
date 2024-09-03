@@ -7,14 +7,13 @@
 #include <Arduino.h>
 #include <FileData.h>
 #include <GyverNTP.h>
-GyverNTP ntp(3);
 #include <WiFiClient.h>
 #define GH_NO_MQTT  // MQTT
 #define GH_INCLUDE_PORTAL
 #include <GyverHub.h>
 GyverHub hub("MyDevices", "BigClock", "f017");
-#include <microDS3231.h>
-MicroDS3231 rtc;
+#include <GyverDS3231.h>
+GyverDS3231 rtc;
 #include <SoftwareSerial.h>
 #include "DFPlayer.h"
 SoftwareSerial mp3Serial;
@@ -25,10 +24,8 @@ DFPlayer mp3;
 GyverBME280 bmp280;
 #include <GyverHTU21D.h>
 GyverHTU21D htu;
-#include <microDS18B20.h>
-MicroDS18B20<ONE_SENSORS_DS> sensors;
-
-
+#include <GyverDS18.h>
+GyverDS18Single ds(ONE_SENSORS_DS);
 
 CRGB ColorTable[16] = {  // Таблица цветов
   CRGB::Amethyst, CRGB::Aqua, CRGB::Blue, CRGB::Chartreuse, CRGB::DarkGreen, CRGB::DarkMagenta, CRGB::DarkOrange, CRGB::DeepPink,
@@ -64,6 +61,9 @@ CRGB* leds;
 
 void setup() {
   Serial.begin(115200);
+  Wire.begin();
+  rtc.begin();
+  NTP.begin(3);
   LittleFS.begin();
   FDstat_t stat1 = _wifi.read();
   FDstat_t stat2 = _clock.read();
@@ -94,25 +94,24 @@ void loop() {
   _other.tick();
   _narod.tick();
   _dfp.tick();
-  hub.sendUpdate("FtempH");
-  hub.sendUpdate("n1");
-  hub.sendUpdate("n2");
-  hub.sendUpdate("new_bright");
-  hub.sendUpdate("FtempS");
-  hub.sendUpdate("pres");
-  hub.sendUpdate("hum");
-  hub.tick();
-  ntp.tick();
-  Brightness();
-  mod();
-  if (dfp.status_kuku) {
-    kuku_tick();
+  if (NTP.tick()) {  // новая секунда
+    hub.update("FtempH").value(FtempH);
+    hub.sendUpdate("time");
+    hub.update("new_bright").value(new_brg);
+    hub.update("FtempS").value(FtempS);
+    hub.update("pres").value(pres);
+    hub.update("hum").value(hum);
+    Brightness();
+    ReadingSensors();
+    if (dfp.status_kuku) {
+      kuku_tick();
+    }
   }
+  hub.tick();
+  rtc.tick();
+  mod();
   if (nm.Enable) {
     static gh::Timer narMon(nm.delay * 1000);
     if (narMon) narodMonitor();
   }
-  // static gh::Timer readingSensors(60000);
-  // if (readingSensors) ReadingSensors();
-  ReadingSensors();
 }
