@@ -15,7 +15,7 @@
     * GyverDS18
     * FastLED
     * **WebSockets 2.4.0**
-    * **JSON 1.4.8**
+    * **GSON 1.4.8**
  * Вручную
     * DFPlayer https://github.com/enjoyneering/DFPlayer
     * GyverHub https://github.com/GyverLibs/GyverHub
