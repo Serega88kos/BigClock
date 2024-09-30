@@ -13,7 +13,7 @@
     * GyverBME280
     * GyverHTU21D
     * GyverDS18
-    * FastLED
+    * **FastLED 3.7.6**
     * **WebSockets 2.4.0**
     * **GSON 1.4.8**
  * Вручную
