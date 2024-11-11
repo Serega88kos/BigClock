@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define VF "Serega88kos/BigClock@2.6"  // версия прошивки
+#define VF "Serega88kos/BigClock@2.7"  // версия прошивки
 //////////// НАСТРОЙКИ ////////////
 //   питание платы от БП не выше 5В
 //   DS3231        SDA=>D2 SCL=>D1 питание с 5В БП или с 3.3В
@@ -7,7 +7,7 @@
 //   DS18B20 питание 5В, если уличный без модуля ставим резистор между питанием и сигнальным на 4.7К
 
 #define ONE_SENSORS_DS D5  // PIN датчика ds18b20
-#define COLOR_ORDER GRB    // тип ленты, поменять порядок GRB на свой тип, если неправильные цвета
+//#define COLOR_ORDER GRB    // тип ленты, поменять порядок GRB на свой тип, если неправильные цвета
 #define LED_PIN 6          // PIN дата от ленты, подключать через резистор 330Ом
 
 //Настройки для DFPlayer
@@ -26,8 +26,8 @@
 #define passAP "administrator"  // не менее 8 символов
 
 struct Wifi {
-  char ssid[32] = "";          // SSID
-  char pass[32] = "";     // пароль
+  char ssid[32] = "";              // SSID
+  char pass[32] = "";              // пароль
   int gmt = 3;                     // часовой пояс, 3 для МСК
   char host[32] = "pool.ntp.org";  // NTP сервер
 };
@@ -40,17 +40,18 @@ struct Clck {
   bool hmd = 1;                           // 0 - не показываем символ влажности, 1 - показать
   bool symbol = 0;                        // 0 - не показывать первый ноль в часах, 1 - показать
   bool mode_sec = 1;                      // режим мигания секунд, 0 - 1р/с, 1 - 2р/с
-  uint8_t modeColor = 0;                  // режимы цветов)
+  uint8_t mode_color = 0;                  // режимы цветов)
   bool htu21d = 0;                        // модуль htu21d
   uint8_t myMods[9] = { 0, 1, 2, 3, 4 };  // режимы
   uint8_t myTime[9] = { 2, 2, 2, 2, 2 };  // время
   int counter = 4;                        // счетчик
-  uint8_t Ledcolor = 2;                   // основной цвет из таблицы
+  uint8_t led_color = 2;                   // основной цвет из таблицы
   uint8_t LEDS_IN_SEGMENT = 4;            // кол-во СД в сегменте
   uint8_t DOTS_NUM = 2;                   // кол-во СД в точках
   uint8_t DOT_TEMP = 0;                   // только если есть дополнительный последний СД для точки десятичной температуры = 1
   bool dotDate = 0;                       // точка для даты
   bool dotInv = 0;                        // сменить точку
+  uint8_t COLOR_ORDER = 0;                // тип ленты 0 = GRB, 1 = RGB
 };
 Clck c;
 
@@ -69,7 +70,7 @@ struct Other {
   uint8_t start_night = 0;  // начало ночного режима в часах
   uint8_t stop_night = 0;   // окончание ночного режима в часах
   int night_brg = 10;       // яркость ночного режима
-  uint8_t NightColor = 2;   // цвет ночного режима
+  uint8_t night_color = 2;   // цвет ночного режима
   bool night_time = 0;      // ночной режим
 };
 Other o;

@@ -19,17 +19,13 @@ void build(gh::Builder& b) {
           b.Input_("host", w.host).label(F("Сервер NTP")).size(4).attach(&flag_w);
           b.Input_("gmt", &w.gmt).label(F("GMT зона")).size(1).attach(&flag_w);
         }
-        if (flag_w) {
-          _wifi.update();
-        }
+        if (flag_w) _wifi.update();
       }
       break;
 
     case 1:
       {
-        bool flag_c = 0;
-        bool flag_sync = 0;
-        bool flag_rst = 0;
+        bool flag_c = 0, flag_sync = 0, flag_rst = 0;
         {
           gh::Row r(b);
           if (!c.rtc_check) {
@@ -39,48 +35,50 @@ void build(gh::Builder& b) {
             b.Label_("time", rtc.toString()).noLabel().fontSize(20).size(3);
           }
           b.Button_("btnn").icon("f0e2").noLabel().size(1).fontSize(20).attach(&flag_sync);
-          if (flag_sync) {
-            rtcCheck();
-          }
+          if (flag_sync) rtcCheck();
         }
         b.Title(F("Настройки ленты")).fontSize(20);
         {
           gh::Row r(b);
-          b.Spinner_("lis", &c.LEDS_IN_SEGMENT).label(F("СД в сегменте")).size(2).fontSize(15).range(1, 6, 1).attach(&flag_c);
+          b.Spinner_("lis", &c.LEDS_IN_SEGMENT).label(F("СД в сегменте")).size(2).fontSize(15).range(1, 10, 1).attach(&flag_c);
           b.Spinner_("dn", &c.DOTS_NUM).label(F("СД точек")).size(2).fontSize(15).range(2, 8, 2).attach(&flag_c);
+        }
+        {
+          gh::Row r(b);
           b.Spinner_("dt", &c.DOT_TEMP).label(F("СД десятки температуры")).size(2).fontSize(15).range(0, 1, 1).attach(&flag_c);
+          b.Select(&c.COLOR_ORDER).text(F("GRB;RGB")).label(F("Тип ленты")).size(2).attach(&flag_c);
         }
-        if (flag_rst) {
-          ESP.restart();
-        }
+        if (flag_rst) ESP.restart();
         b.Title(F("Настройки часов")).fontSize(20);
         {
           gh::Row r(b);
           b.SwitchIcon(&c.rtc_check).label(F("Есть RTC?")).fontSize(15).size(1).attach(&flag_c);
           b.SwitchIcon(&c.htu21d).label(F("Есть htu21d?")).fontSize(15).size(1).attach(&flag_c);
-          b.Select(&c.modeColor).text(F("Одноцветный;Новый год;Градиент темп")).label(F("Режимы цветов")).size(2).attach(&flag_c);
+          b.Select(&c.mode_color).text(F("Одноцветный;Новый год;Градиент темп")).label(F("Режимы цветов")).size(2).attach(&flag_c);
         }
         {
           gh::Row r(b);
           b.Select(&c.change_color).text(F("выключена;раз в минуту;каждые 10 минут;каждый час")).label(F("Смена цвета?")).attach(&flag_c);
-          b.Select(&c.Ledcolor).text(F("Amethyst;Aqua;Blue;Chartreuse;DarkGreen;DarkMagenta;DarkOrange;DeepPink;Fuchsia;Gold;GreenYellow;LightCoral;Tomato;Salmon;Red;Orchid")).label(F("Цвет часов")).attach(&flag_c);
+          b.Select(&c.led_color).text(F("Amethyst;Aqua;Blue;Chartreuse;DarkGreen;DarkMagenta;DarkOrange;DeepPink;Fuchsia;Gold;GreenYellow;LightCoral;Tomato;Salmon;Red;Orchid")).label(F("Цвет часов")).attach(&flag_c);
         }
         b.Title(F("Символы")).fontSize(20);
         {
           gh::Row r(b);
-          b.SwitchIcon(&c.prs).label(F("Символ давления")).fontSize(15).attach(&flag_c);
-          b.SwitchIcon(&c.hmd).label(F("Символ влажности")).fontSize(15).attach(&flag_c);
+          b.SwitchIcon(&c.prs).label(F("Давления")).fontSize(15).attach(&flag_c);
+          b.SwitchIcon(&c.hmd).label(F("Влажности")).fontSize(15).attach(&flag_c);
           b.SwitchIcon(&c.symbol).label(F("Первый ноль в часах")).fontSize(15).attach(&flag_c);
         }
         {
           gh::Row r(b);
-          b.SwitchIcon(&c.mode_sec).label(F("Режим секунд")).fontSize(15).attach(&flag_c);
+          if (!c.mode_sec) b.SwitchIcon(&c.mode_sec).label(F("Точки 1 р/с")).fontSize(15).attach(&flag_c);
+          if (c.mode_sec) b.SwitchIcon(&c.mode_sec).label(F("Точки 2 р/с")).fontSize(15).attach(&flag_c);
           b.SwitchIcon(&c.dotDate).label(F("Точка даты")).fontSize(15).attach(&flag_c);
           b.SwitchIcon(&c.dotInv).label(F("Сменить точку")).fontSize(15).attach(&flag_c);
         }
         if (flag_c) {
           _clock.update();
-          ledColor = ColorTable[c.Ledcolor];
+          ledColor = ColorTable[c.led_color];
+          b.refresh();
         }
         b.Title(F("Режимы часов")).fontSize(20);
         bool flag_modes = 0;
@@ -88,8 +86,7 @@ void build(gh::Builder& b) {
           GH::Row r(b);
           b.Spinner_("spin", &c.counter).label(F("Кол-во режимов")).size(2).range(1, 8, 1).size(1).attach(&flag_modes);
           b.Space().size(2);
-          if (flag_modes)
-            b.refresh();
+          if (flag_modes) b.refresh();
         }
         b.Title("");
         for (int i = 0; i < c.counter; i++) {
@@ -114,7 +111,8 @@ void build(gh::Builder& b) {
         {
           gh::Row r(b);
           b.SwitchIcon(&o.auto_brg).label(F("Автояркость")).fontSize(15).attach(&flag_o);
-          b.SwitchIcon(&o.type_brg).label(F("Цифровой датчик?")).fontSize(15).attach(&flag_o);
+          if (o.type_brg) b.SwitchIcon(&o.type_brg).label(F("Аналоговый датчик")).fontSize(15).attach(&flag_o);
+          if (!o.type_brg) b.SwitchIcon(&o.type_brg).label(F("Цифровой датчик")).fontSize(15).attach(&flag_o);
           b.SwitchIcon(&o.min_max).label(F("Инвертировать")).fontSize(15).attach(&flag_o);
           b.Label_("new_bright", String(new_brg)).label(F("Текущая")).fontSize(20);
         }
@@ -127,7 +125,8 @@ void build(gh::Builder& b) {
         b.Title(F("Ночной режим")).fontSize(20);
         {
           gh::Row r(b);
-          b.SwitchIcon(&o.night_mode).label(F("Включить")).fontSize(15).attach(&flag_o);
+          if (o.night_mode) b.SwitchIcon(&o.night_mode).label(F("Включен")).fontSize(15).attach(&flag_o);
+          if (!o.night_mode) b.SwitchIcon(&o.night_mode).label(F("Выключен")).fontSize(15).attach(&flag_o);
           b.Spinner(&o.night_brg).label(F("Яркость")).range(0, 20, 1).fontSize(15).attach(&flag_o);
           b.SwitchIcon(&o.night_time).label(F("Только часы")).fontSize(15).attach(&flag_o);
         }
@@ -135,7 +134,7 @@ void build(gh::Builder& b) {
           gh::Row r(b);
           b.Select(&o.start_night).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Включить в")).fontSize(20).attach(&flag_o);
           b.Select(&o.stop_night).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Выключить в")).fontSize(20).attach(&flag_o);
-          b.Select(&o.NightColor).text(F("Amethyst;Aqua;Blue;Chartreuse;DarkGreen;DarkMagenta;DarkOrange;DeepPink;Fuchsia;Gold;GreenYellow;LightCoral;Tomato;Salmon;Red;Orchid")).label(F("Цвет часов")).attach(&flag_o);
+          b.Select(&o.night_color).text(F("Amethyst;Aqua;Blue;Chartreuse;DarkGreen;DarkMagenta;DarkOrange;DeepPink;Fuchsia;Gold;GreenYellow;LightCoral;Tomato;Salmon;Red;Orchid")).label(F("Цвет часов")).attach(&flag_o);
         }
         b.Title(F("Корректировка показаний")).fontSize(20);
         {
@@ -154,6 +153,7 @@ void build(gh::Builder& b) {
         }
         if (flag_o) {
           _other.update();
+          b.refresh();
         }
       }
       break;
@@ -163,11 +163,11 @@ void build(gh::Builder& b) {
         bool flag_m = 0;
         {
           gh::Row r(b);
-          b.SwitchIcon(&nm.Enable).label(F("Включить")).fontSize(15).size(1).attach(&flag_m);
+          if (nm.Enable) b.SwitchIcon(&nm.Enable).label(F("Включен")).fontSize(15).size(1).attach(&flag_m);
+          if (!nm.Enable) b.SwitchIcon(&nm.Enable).label(F("Выключен")).fontSize(15).size(1).attach(&flag_m);
           b.HTML(F("<a href='https://narodmon.ru/?invite=asm'>narodmon.ru</a>")).noLabel().fontSize(15).size(2);
           b.Input(&nm.delay).label(F("Интервал, в сек.")).size(1).attach(&flag_m);
         }
-
         {
           gh::Row r(b);
           b.SwitchIcon(&nm.tempH).label(F("Комнатная")).fontSize(15).attach(&flag_m);
@@ -177,37 +177,30 @@ void build(gh::Builder& b) {
         }
         if (flag_m) {
           _narod.update();
+          b.refresh();
         }
       }
       break;
 
     case 4:
       {
-
         b.Title(F("Настройки DFP")).fontSize(20);
-        bool flag_dfp = 0;
-        bool flag_test_dfp = 0;
-        bool flag_dfp_vol = 0;
+        bool flag_dfp = 0, flag_test_dfp = 0, flag_dfp_vol = 0;
         {
           gh::Row r(b);
           b.Select(&dfp.board).text(F("DFPLAYER_MINI;DFPLAYER_FN_X10P;DFPLAYER_HW_247A;DFPLAYER_NO_CHECKSUM")).label(F("Тип платы")).size(2).attach(&flag_dfp);
-          b.SwitchIcon(&dfp.status_kuku).label(F("Вкл. модуль")).fontSize(15).size(1).attach(&flag_dfp);
-          if (dfp.status_kuku) {
-            b.Button_("btnTest").label(F("Тест")).fontSize(20).icon("f04b").size(1).attach(&flag_test_dfp);
-          } else {
-            b.Button_("btnTest").label(F("Тест [выкл]")).fontSize(20).icon("f04b").size(1).disabled();
-          }
+          if (dfp.status_kuku) b.SwitchIcon(&dfp.status_kuku).label(F("Включен")).fontSize(15).size(1).attach(&flag_dfp);
+          if (!dfp.status_kuku) b.SwitchIcon(&dfp.status_kuku).label(F("Выключен")).fontSize(15).size(1).attach(&flag_dfp);
+          if (dfp.status_kuku) b.Button_("btnTest").label(F("Тест")).fontSize(20).icon("f04b").size(1).attach(&flag_test_dfp);
+          if (!dfp.status_kuku) b.Button_("btnTest").label(F("Тест [выкл]")).fontSize(20).icon("f04b").size(1).disabled();
         }
         {
           gh::Row r(b);
-
           b.Select(&dfp.start_kuku).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Вкл с")).fontSize(20).attach(&flag_dfp);
           b.Select(&dfp.stop_kuku).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Вкл до")).fontSize(20).attach(&flag_dfp);
           b.Spinner(&dfp.grom_mp3).label(F("Громкость")).fontSize(15).range(0, 30, 1).attach(&flag_dfp_vol);
         }
-        if (flag_test_dfp) {
-          mp3.playMP3Folder((dfp.golos * 100) + hour + 1);
-        }
+        if (flag_test_dfp) mp3.playMP3Folder((dfp.golos * 100) + hour + 1);
         b.Title(F("Режимы")).fontSize(20);
         {
           gh::Row r(b);
@@ -218,9 +211,7 @@ void build(gh::Builder& b) {
         if (flag_dfp) {
           _dfp.update();
         }
-        if (flag_dfp_vol) {
-          mp3.setVolume(dfp.grom_mp3);
-        }
+        if (flag_dfp_vol) mp3.setVolume(dfp.grom_mp3);
       }
       break;
   }

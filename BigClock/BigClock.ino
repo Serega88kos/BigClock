@@ -31,7 +31,7 @@ CRGB ColorTable[16] = {  // Таблица цветов
   CRGB::Amethyst, CRGB::Aqua, CRGB::Blue, CRGB::Chartreuse, CRGB::DarkGreen, CRGB::DarkMagenta, CRGB::DarkOrange, CRGB::DeepPink,
   CRGB::Fuchsia, CRGB::Gold, CRGB::GreenYellow, CRGB::LightCoral, CRGB::Tomato, CRGB::Salmon, CRGB::Red, CRGB::Orchid
 };
-CRGB ledColor = ColorTable[c.Ledcolor];
+CRGB ledColor = ColorTable[c.led_color];
 
 DEFINE_GRADIENT_PALETTE(Temperature){
   0, 0, 0, 139,                //DarkBlue
@@ -63,18 +63,19 @@ void setup() {
   Serial.begin(115200);
   Wire.begin();
   rtc.begin();
-  NTP.begin(3);
+  NTP.begin(w.gmt);
   LittleFS.begin();
   FDstat_t stat1 = _wifi.read();
   FDstat_t stat2 = _clock.read();
   FDstat_t stat3 = _other.read();
   FDstat_t stat4 = _narod.read();
   FDstat_t stat5 = _dfp.read();
-  if (c.htu21d) { htu.begin(); }
+  if (c.htu21d) htu.begin();
   bmp280.begin();
   NUM_LEDS = (c.LEDS_IN_SEGMENT * 28 + c.DOTS_NUM + c.DOT_TEMP);  // вычисляем кол-во светодиодов
   leds = new CRGB[NUM_LEDS];
-  FastLED.addLeds<WS2812B, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);  // подключение ленты
+  if (c.COLOR_ORDER == 0) FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);  // подключение ленты
+  if (c.COLOR_ORDER == 1) FastLED.addLeds<WS2812B, LED_PIN, RGB>(leds, NUM_LEDS);  // подключение ленты
   FastLED.setBrightness(50);
   segment_4 = (NUM_LEDS - c.DOT_TEMP) - c.LEDS_IN_SEGMENT * 7;
   segment_3 = (NUM_LEDS - c.DOT_TEMP) - c.LEDS_IN_SEGMENT * 14;
@@ -88,7 +89,6 @@ void setup() {
 }
 
 void loop() {
-  if (c.htu21d) { htu.readTick(); }
   _wifi.tick();
   _clock.tick();
   _other.tick();
@@ -103,9 +103,7 @@ void loop() {
     hub.update("hum").value(hum);
     Brightness();
     ReadingSensors();
-    if (dfp.status_kuku) {
-      kuku_tick();
-    }
+    if (dfp.status_kuku) kuku_tick();
   }
   hub.tick();
   rtc.tick();

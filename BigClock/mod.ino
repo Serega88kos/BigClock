@@ -1,14 +1,14 @@
+static byte mode;
+gh::Timer timerMode(c.myTime[mode] * 1000);
+gh::Timer timerFastLED(500);
 void mod() {
   static uint32_t tmr;
-  static byte mode;
   if (o.night_mode && o.night_time && (hour >= o.start_night && hour < o.stop_night)) {
     TimeToArray();
     Brightness();
     timeToDots();
   } else {
-
-    if ((millis() - tmr) >= (c.myTime[mode] * 1000)) {
-      tmr = millis();
+    if (timerMode) {
       if (++mode >= c.counter) mode = 0;
     }
     switch (c.myMods[mode]) {
@@ -34,17 +34,14 @@ void mod() {
         break;
     }
   }
-
-  static uint32_t Ftiming;
-  if (millis() - Ftiming > 500) {
-    Ftiming = millis();
-    FastLED.show();
-  }
+  if (timerFastLED) FastLED.show();
 }
-
+gh::Timer timerDot(1000);
 void timeToDots() {
   static bool showDot = false;
-  static gh::Timer timer(c.mode_sec ? 500 : 1000);
-  if (timer) { showDot = !showDot; }
-  showDot ? Dots(Dot) : Dots(!Dot);
+  if (timerDot) {
+    timerDot.setTime(c.mode_sec ? 500 : 1000);
+    showDot = !showDot;
+    Dots(showDot);
+  }
 }

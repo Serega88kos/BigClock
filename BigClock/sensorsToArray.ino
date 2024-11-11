@@ -1,5 +1,7 @@
 //////////// Функции опросов датчиков и их преобразования
+gh::Timer timerDS(10000);
 void ReadingSensors() {
+  if (c.htu21d) htu.readTick();
   FtempH = (bmp280.readTemperature()) + o.cor_tempH;
   float pressure = bmp280.readPressure();
   Fpres = pressureToMmHg(pressure) + o.cor_pres;
@@ -8,11 +10,8 @@ void ReadingSensors() {
   } else {
     hum = bmp280.readHumidity() + o.cor_hum;
   }
-  ds.requestTemp();
-  if (ds.waitReady()) {
-    if (ds.readTemp())
-      FtempS = ds.getTemp() + o.cor_tempS;
-  }
+  if (timerDS) ds.requestTemp();
+  if (ds.readTemp()) FtempS = ds.getTemp() + o.cor_tempS;
 }
 
 void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран
@@ -39,9 +38,9 @@ void TempStreetToArray() {  // вывод уличной температуры 
   //Serial.println((String)tempS + " | " + FtempS);
   Dots(!Dot);
   if (c.DOT_TEMP == 1) {
-    if (c.modeColor == 1) {
+    if (c.mode_color == 1) {
       leds[NUM_LEDS - 1] = ColorTable[rand() % 16];
-    } else if (c.modeColor == 0) {
+    } else if (c.mode_color == 0) {
       leds[NUM_LEDS - 1] = ledColor;
     }
     int a = FtempS * 10;                   //25.43 -> 254
