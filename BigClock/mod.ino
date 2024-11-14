@@ -1,14 +1,15 @@
 static byte mode;
-gh::Timer timerMode(c.myTime[mode] * 1000);
+//gh::Timer timerMode(c.myTime[mode] * 1000);
 gh::Timer timerFastLED(500);
 void mod() {
   static uint32_t tmr;
-  if (o.night_mode && o.night_time && (hour >= o.start_night && hour < o.stop_night)) {
+  if (o.night_mode && o.night_time && flag_night) {
     TimeToArray();
     Brightness();
     timeToDots();
   } else {
-    if (timerMode) {
+    if ((millis() - tmr) >= (c.myTime[mode] * 1000)) {
+      tmr = millis();
       if (++mode >= c.counter) mode = 0;
     }
     switch (c.myMods[mode]) {

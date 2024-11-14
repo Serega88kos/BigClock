@@ -1,12 +1,12 @@
 //////////// Настройка точек
 void Dots(boolean Dot_On) {
-  for (int i = 0; i < c.DOTS_NUM; i++) {
+  for (int i = 0; i < s.DOTS_NUM; i++) {
     switch (c.mode_color) {
       case 1:
-        leds[(c.LEDS_IN_SEGMENT * 14) + i] = (Dot_On) ? ColorTable[rand() % 16] : CRGB::Black;
+        leds[(s.LEDS_IN_SEGMENT * 14) + i] = (Dot_On) ? ColorTable[rand() % 16] : CRGB::Black;
         break;
       default:
-        leds[(c.LEDS_IN_SEGMENT * 14) + i] = (Dot_On) ? ledColor : CRGB::Black;
+        leds[(s.LEDS_IN_SEGMENT * 14) + i] = (Dot_On) ? ledColor : CRGB::Black;
         break;
     }
   }
@@ -39,7 +39,7 @@ uint8_t digits[] = {
 int d;
 void Digit(uint8_t digit, uint8_t cursor) {  // функция отображения символов
   for (uint8_t mask = 0b01000000; mask > 0; mask = mask >> 1) {
-    for (uint8_t i = 0; i < c.LEDS_IN_SEGMENT; i++) {
+    for (uint8_t i = 0; i < s.LEDS_IN_SEGMENT; i++) {
       switch (c.mode_color) {
         case 1:  //Новый год
           leds[cursor] = (digit & mask) ? ColorTable[rand() % 16] : CRGB::Black;
@@ -55,13 +55,16 @@ void Digit(uint8_t digit, uint8_t cursor) {  // функция отображе�
 
 void DigitTempS(uint8_t digit, uint8_t cursor) {  // функция отображения символов
   for (uint8_t mask = 0b01000000; mask > 0; mask = mask >> 1) {
-    for (uint8_t i = 0; i < c.LEDS_IN_SEGMENT; i++) {
+    for (uint8_t i = 0; i < s.LEDS_IN_SEGMENT; i++) {
       switch (c.mode_color) {
         case 1:  //Новый год
           leds[cursor] = (digit & mask) ? ColorTable[rand() % 16] : CRGB::Black;
           break;
         case 2:
           leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette, 128 + tempS, 255, NOBLEND) : CRGB::Black;
+          break;
+        case 3:
+          leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette2, 128 + tempS, 255, NOBLEND) : CRGB::Black;
           break;
         default:
           leds[cursor] = (digit & mask) ? ledColor : CRGB::Black;
@@ -74,7 +77,7 @@ void DigitTempS(uint8_t digit, uint8_t cursor) {  // функция отобра
 
 void DigitTempH(uint8_t digit, uint8_t cursor) {  // функция отображения символов
   for (uint8_t mask = 0b01000000; mask > 0; mask = mask >> 1) {
-    for (uint8_t i = 0; i < c.LEDS_IN_SEGMENT; i++) {
+    for (uint8_t i = 0; i < s.LEDS_IN_SEGMENT; i++) {
       switch (c.mode_color) {
         case 1:  //Новый год
           leds[cursor] = (digit & mask) ? ColorTable[rand() % 16] : CRGB::Black;

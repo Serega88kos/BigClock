@@ -46,13 +46,27 @@ DEFINE_GRADIENT_PALETTE(Temperature){
 };
 CRGBPalette256 myPalette = Temperature;
 
+DEFINE_GRADIENT_PALETTE(Temperature2){
+  00, 0, 0, 139,               //DarkBlue
+  128 - 30 * 2, 138, 43, 255,  //BlueViolet
+  128 - 20 * 2, 30, 144, 255,  //DodgerBlue
+  128 - 10 * 2, 0, 255, 255,   //Aqua
+  128 + 0, 0, 250, 154,        //MediumSpringGreen
+  128 + 10, 0, 255, 0,         //Lime
+  128 + 20, 173, 255, 47,      //GreenYellow
+  128 + 30, 255, 165, 0,       //Orange
+  255, 255, 0, 0               //Red
+};
+CRGBPalette256 myPalette2 = Temperature2;
+
 FileData _wifi(&LittleFS, "/wifi.dat", 'A', &w, sizeof(w));
 FileData _clock(&LittleFS, "/clock.dat", 'A', &c, sizeof(c));
 FileData _other(&LittleFS, "/other.dat", 'A', &o, sizeof(o));
 FileData _narod(&LittleFS, "/narod.dat", 'A', &nm, sizeof(nm));
 FileData _dfp(&LittleFS, "/dfp.dat", 'A', &dfp, sizeof(dfp));
+FileData _set(&LittleFS, "/set.dat", 'A', &s, sizeof(s));
 
-bool Dot = true, Utro_flag, Utro_play_flag, Vecher_flag, Vecher_play_flag, Vremy_flag, Vremy_play_flag, flag_kuku;
+bool Dot = true, Utro_flag, Utro_play_flag, Vecher_flag, Vecher_play_flag, Vremy_flag, Vremy_play_flag, flag_kuku, flag_night;
 uint8_t last_digit = 0, tempH, hum, hour, minute, second, day, month, tab = 0, segment_1, segment_2, segment_3, segment_4;
 int8_t tempS;
 uint16_t new_brg, pres, year, NUM_LEDS;
@@ -70,17 +84,18 @@ void setup() {
   FDstat_t stat3 = _other.read();
   FDstat_t stat4 = _narod.read();
   FDstat_t stat5 = _dfp.read();
+  FDstat_t stat6 = _set.read();
   if (c.htu21d) htu.begin();
   bmp280.begin();
-  NUM_LEDS = (c.LEDS_IN_SEGMENT * 28 + c.DOTS_NUM + c.DOT_TEMP);  // вычисляем кол-во светодиодов
+  NUM_LEDS = (s.LEDS_IN_SEGMENT * 28 + s.DOTS_NUM + s.DOT_TEMP);  // вычисляем кол-во светодиодов
   leds = new CRGB[NUM_LEDS];
-  if (c.COLOR_ORDER == 0) FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);  // подключение ленты
-  if (c.COLOR_ORDER == 1) FastLED.addLeds<WS2812B, LED_PIN, RGB>(leds, NUM_LEDS);  // подключение ленты
+  if (s.COLOR_ORDER == 0) FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);  // подключение ленты
+  if (s.COLOR_ORDER == 1) FastLED.addLeds<WS2812B, LED_PIN, RGB>(leds, NUM_LEDS);  // подключение ленты
   FastLED.setBrightness(50);
-  segment_4 = (NUM_LEDS - c.DOT_TEMP) - c.LEDS_IN_SEGMENT * 7;
-  segment_3 = (NUM_LEDS - c.DOT_TEMP) - c.LEDS_IN_SEGMENT * 14;
-  segment_2 = (NUM_LEDS - c.DOT_TEMP) - c.LEDS_IN_SEGMENT * 21 - c.DOTS_NUM;
-  segment_1 = (NUM_LEDS - c.DOT_TEMP) - c.LEDS_IN_SEGMENT * 28 - c.DOTS_NUM;
+  segment_4 = (NUM_LEDS - s.DOT_TEMP) - s.LEDS_IN_SEGMENT * 7;
+  segment_3 = (NUM_LEDS - s.DOT_TEMP) - s.LEDS_IN_SEGMENT * 14;
+  segment_2 = (NUM_LEDS - s.DOT_TEMP) - s.LEDS_IN_SEGMENT * 21 - s.DOTS_NUM;
+  segment_1 = (NUM_LEDS - s.DOT_TEMP) - s.LEDS_IN_SEGMENT * 28 - s.DOTS_NUM;
   wifi_connected();
   if (dfp.status_kuku) DFPlayer_setup();
   hub.onBuild(build);  // подключаем билдер
@@ -94,6 +109,7 @@ void loop() {
   _other.tick();
   _narod.tick();
   _dfp.tick();
+  _set.tick();
   if (NTP.tick()) {  // новая секунда
     hub.update("FtempH").value(FtempH);
     hub.sendUpdate("time");
@@ -103,8 +119,8 @@ void loop() {
     hub.update("hum").value(hum);
     Brightness();
     ReadingSensors();
-    if (dfp.status_kuku) kuku_tick();
   }
+  if (dfp.status_kuku) kuku_tick();
   hub.tick();
   rtc.tick();
   mod();
@@ -112,4 +128,5 @@ void loop() {
     static gh::Timer narMon(nm.delay * 1000);
     if (narMon) narodMonitor();
   }
+  if (w.passInput) hub.setPIN(passIn);
 }

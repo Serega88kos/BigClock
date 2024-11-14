@@ -15,7 +15,7 @@ void ReadingSensors() {
 }
 
 void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран
-  if (c.DOT_TEMP == 1) {
+  if (s.DOT_TEMP == 1) {
     leds[NUM_LEDS - 1] = CRGB::Black;
   }
   tempH = FtempH;
@@ -37,7 +37,7 @@ void TempStreetToArray() {  // вывод уличной температуры 
   tempS = FtempS;
   //Serial.println((String)tempS + " | " + FtempS);
   Dots(!Dot);
-  if (c.DOT_TEMP == 1) {
+  if (s.DOT_TEMP == 1) {
     if (c.mode_color == 1) {
       leds[NUM_LEDS - 1] = ColorTable[rand() % 16];
     } else if (c.mode_color == 0) {
@@ -77,7 +77,7 @@ void TempStreetToArray() {  // вывод уличной температуры 
 }
 
 void PressToArray() {  // вывод давления на экран с датчика BMP/BME280
-  if (c.DOT_TEMP == 1) {
+  if (s.DOT_TEMP == 1) {
     leds[NUM_LEDS - 1] = CRGB::Black;
   }
   pres = Fpres;
@@ -97,7 +97,7 @@ void PressToArray() {  // вывод давления на экран с дат�
 }
 
 void HumToArray() {  // вывод влажности с датчика BME280 на экран
-  if (c.DOT_TEMP == 1) {
+  if (s.DOT_TEMP == 1) {
     leds[NUM_LEDS - 1] = CRGB::Black;
   }
   Dots(!Dot);
@@ -120,9 +120,9 @@ void DateToArray() {
   }
   if (c.dotDate) {
     if (c.dotInv) {
-      leds[c.LEDS_IN_SEGMENT * 14] = ledColor;
+      leds[s.LEDS_IN_SEGMENT * 14] = ledColor;
     } else {
-      leds[c.LEDS_IN_SEGMENT * 14 + 1] = ledColor;
+      leds[s.LEDS_IN_SEGMENT * 14 + 1] = ledColor;
     }
   }
   int digit = day % 10;

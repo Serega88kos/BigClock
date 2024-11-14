@@ -1,7 +1,7 @@
 void build(gh::Builder& b) {
   {
     GH::Row r(b);
-    b.Tabs(&tab).text(F("Главная;Часы;Другие;Мониторинг;Плеер")).noLabel().click();
+    b.Tabs(&tab).text(F("Главная;Часы;Другие;Мониторинг;Плеер;Настройки")).noLabel().click();
     if (b.changed()) b.refresh();
   }
   switch (tab) {
@@ -19,42 +19,29 @@ void build(gh::Builder& b) {
           b.Input_("host", w.host).label(F("Сервер NTP")).size(4).attach(&flag_w);
           b.Input_("gmt", &w.gmt).label(F("GMT зона")).size(1).attach(&flag_w);
         }
-        if (flag_w) _wifi.update();
+        if (flag_w) {
+          _wifi.update();
+          NTP.begin(w.gmt);
+        }
       }
       break;
 
     case 1:
       {
-        bool flag_c = 0, flag_sync = 0, flag_rst = 0;
+        bool flag_c = 0, flag_sync = 0;
         {
           gh::Row r(b);
-          if (!c.rtc_check) {
-            b.Label_("time", NTP.toString()).noLabel().fontSize(20).size(3);
-          }
-          if (c.rtc_check) {
-            b.Label_("time", rtc.toString()).noLabel().fontSize(20).size(3);
-          }
+          if (!c.rtc_check) b.Label_("time", NTP.toString()).noLabel().fontSize(20).size(3);
+          if (c.rtc_check) b.Label_("time", rtc.toString()).noLabel().fontSize(20).size(3);
           b.Button_("btnn").icon("f0e2").noLabel().size(1).fontSize(20).attach(&flag_sync);
           if (flag_sync) rtcCheck();
         }
-        b.Title(F("Настройки ленты")).fontSize(20);
-        {
-          gh::Row r(b);
-          b.Spinner_("lis", &c.LEDS_IN_SEGMENT).label(F("СД в сегменте")).size(2).fontSize(15).range(1, 10, 1).attach(&flag_c);
-          b.Spinner_("dn", &c.DOTS_NUM).label(F("СД точек")).size(2).fontSize(15).range(2, 8, 2).attach(&flag_c);
-        }
-        {
-          gh::Row r(b);
-          b.Spinner_("dt", &c.DOT_TEMP).label(F("СД десятки температуры")).size(2).fontSize(15).range(0, 1, 1).attach(&flag_c);
-          b.Select(&c.COLOR_ORDER).text(F("GRB;RGB")).label(F("Тип ленты")).size(2).attach(&flag_c);
-        }
-        if (flag_rst) ESP.restart();
         b.Title(F("Настройки часов")).fontSize(20);
         {
           gh::Row r(b);
           b.SwitchIcon(&c.rtc_check).label(F("Есть RTC?")).fontSize(15).size(1).attach(&flag_c);
           b.SwitchIcon(&c.htu21d).label(F("Есть htu21d?")).fontSize(15).size(1).attach(&flag_c);
-          b.Select(&c.mode_color).text(F("Одноцветный;Новый год;Градиент темп")).label(F("Режимы цветов")).size(2).attach(&flag_c);
+          b.Select(&c.mode_color).text(F("Одноцветный;Новый год;Градиент темп 1;Градиент темп 2")).label(F("Режимы цветов")).size(2).attach(&flag_c);
         }
         {
           gh::Row r(b);
@@ -200,7 +187,10 @@ void build(gh::Builder& b) {
           b.Select(&dfp.stop_kuku).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Вкл до")).fontSize(20).attach(&flag_dfp);
           b.Spinner(&dfp.grom_mp3).label(F("Громкость")).fontSize(15).range(0, 30, 1).attach(&flag_dfp_vol);
         }
-        if (flag_test_dfp) mp3.playMP3Folder((dfp.golos * 100) + hour + 1);
+        if (flag_test_dfp) {
+          mp3.setVolume(dfp.grom_mp3);
+          mp3.playMP3Folder((dfp.golos * 100) + hour + 1);
+        }
         b.Title(F("Режимы")).fontSize(20);
         {
           gh::Row r(b);
@@ -208,10 +198,28 @@ void build(gh::Builder& b) {
           b.SwitchIcon(&dfp.vrem_mp3_check).label(F("Время")).fontSize(15).attach(&flag_dfp);
           b.Select(&dfp.golos).text(F("Алиса;Женский;Мужской")).label(F("Голос")).attach(&flag_dfp);
         }
-        if (flag_dfp) {
-          _dfp.update();
-        }
+        if (flag_dfp) _dfp.update();
+
         if (flag_dfp_vol) mp3.setVolume(dfp.grom_mp3);
+      }
+      break;
+
+    case 5:
+      {
+        bool flag_set = 0;
+        b.Title(F("Настройки")).fontSize(20);
+        {
+          gh::Row r(b);
+          b.Spinner_("lis", &s.LEDS_IN_SEGMENT).label(F("СД в сегменте")).size(2).fontSize(15).range(1, 10, 1).attach(&flag_set);
+          b.Spinner_("dn", &s.DOTS_NUM).label(F("СД точек")).size(2).fontSize(15).range(2, 8, 2).attach(&flag_set);
+        }
+        {
+          gh::Row r(b);
+          b.Spinner_("dt", &s.DOT_TEMP).label(F("СД десятки температуры")).size(2).fontSize(15).range(0, 1, 1).attach(&flag_set);
+          b.Select(&s.COLOR_ORDER).text(F("GRB;RGB")).label(F("Тип ленты")).size(2).attach(&flag_set);
+          b.SwitchIcon(&w.passInput).label(F("Пароль на вход")).fontSize(15).size(2).attach(&flag_set);
+        }
+        if (flag_set) _set.update();
       }
       break;
   }
