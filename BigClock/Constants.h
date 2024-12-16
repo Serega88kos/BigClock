@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define VF "Serega88kos/BigClock@2.8"  // версия прошивки
+#define VF "Serega88kos/BigClock@3.0"  // версия прошивки
 //////////// НАСТРОЙКИ ////////////
 //   питание платы от БП не выше 5В
 //   DS3231        SDA=>D2 SCL=>D1 питание с 5В БП или с 3.3В
@@ -48,8 +48,10 @@ struct Clck {
   uint8_t myTime[9] = { 2, 2, 2, 2, 2 };  // время
   int counter = 4;                        // счетчик
   uint8_t led_color = 2;                  // основной цвет из таблицы
-  bool dotDate = 0;  // точка для даты
-  bool dotInv = 0;   // сменить точку
+  bool dotDate = 0;                       // точка для даты
+  bool dotInv = 0;                        // сменить точку
+  bool radioDS = 0;                       // модуль RADIO_DS18B20
+  uint8_t radioAddrDS = 0xAA;
 };
 Clck c;
 
@@ -107,6 +109,7 @@ struct Settings {
   uint8_t DOTS_NUM = 2;         // кол-во СД в точках
   uint8_t DOT_TEMP = 0;         // только если есть дополнительный последний СД для точки десятичной температуры = 1
   uint8_t COLOR_ORDER = 0;      // тип ленты 0 = GRB, 1 = RGB
+  uint8_t mode_udp = 0;         // режим работы локального UDP для отправки показаний DS18B20
 };
 Settings s;
 /////////////////// КОНЕЦ НАСТРОЕК /////////////////

@@ -14,3 +14,20 @@ void narodMonitor() {
   //Вывод в монитор порта
   Serial.println((String) + "Показания отправлены! " + FtempH + " | " + FtempS + " | " + Fpres + " | " + hum);
 }
+
+void sendUDP() {
+  Udp.beginPacket("255.255.255.255", 8888);
+  Udp.print(FtempS);
+  Udp.endPacket();
+  //Serial.println((String) + "sendUDP " + FtempS);
+}
+
+void readUDP() {
+  Udp.beginPacket("255.255.255.255", 8888);
+  if (Udp.parsePacket()) {
+    String str = "none";
+    str = Udp.readString();
+    FtempS = str.toFloat();
+    //Serial.println((String) + "readUDP " + str + "toFloat " + FtempS);
+  }
+}

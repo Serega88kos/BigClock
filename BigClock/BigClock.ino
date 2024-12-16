@@ -2,7 +2,10 @@
 //Обсуждение работы на форуме https://community.alexgyver.ru/threads/bolshie-chasy-na-ws2812-esp8266-narodnyj-monitoring.5067
 //Поблагодарить за труд, можно на Яндекс 410014148046232
 #include "Constants.h"
+#include "RX.h"
 #include "ESP8266WiFi.h"
+#include <WiFiUdp.h>
+WiFiUDP Udp;
 #include <LittleFS.h>
 #include <Arduino.h>
 #include <FileData.h>
@@ -72,6 +75,8 @@ int8_t tempS;
 uint16_t new_brg, pres, year, NUM_LEDS;
 float FtempH, FtempS, Fpres;
 CRGB* leds;
+unsigned int localPort = 8888;
+const uint8_t addrRadDS[] = {0xAA, 0xBB, 0xEE, 0xCC};  
 
 void setup() {
   Serial.begin(115200);
@@ -100,6 +105,7 @@ void setup() {
   if (dfp.status_kuku) DFPlayer_setup();
   hub.onBuild(build);  // подключаем билдер
   hub.setVersion(VF);
+  initPinRX(13);
   ReadingSensors();
 }
 

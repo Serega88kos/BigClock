@@ -19,6 +19,15 @@ void build(gh::Builder& b) {
           b.Input_("host", w.host).label(F("Сервер NTP")).size(4).attach(&flag_w);
           b.Input_("gmt", &w.gmt).label(F("GMT зона")).size(1).attach(&flag_w);
         }
+        if (WiFi.status() != WL_CONNECTED) {
+          int n = WiFi.scanNetworks();
+          for (int j = 0; j < n; j++) {
+            {
+              gh::Row r(b);
+              b.Label(String(j + 1) + ": " + WiFi.SSID(j) + " (" + WiFi.RSSI(j) + ")").fontSize(15).noLabel().noTab().align(gh::Align::Left);
+            }
+          }
+        }
         if (flag_w) {
           _wifi.update();
           NTP.begin(w.gmt);
@@ -41,10 +50,12 @@ void build(gh::Builder& b) {
           gh::Row r(b);
           b.SwitchIcon(&c.rtc_check).label(F("Есть RTC?")).fontSize(15).size(1).attach(&flag_c);
           b.SwitchIcon(&c.htu21d).label(F("Есть htu21d?")).fontSize(15).size(1).attach(&flag_c);
-          b.Select(&c.mode_color).text(F("Одноцветный;Новый год;Градиент темп 1;Градиент темп 2")).label(F("Режимы цветов")).size(2).attach(&flag_c);
+          b.SwitchIcon(&c.radioDS).label(F("Есть radioDS?")).fontSize(15).size(1).attach(&flag_c);
+          b.Select(&c.radioAddrDS).text(F("0xAA;0xBB;0xEE;0xCC")).label(F("Адрес radioDS")).size(1).attach(&flag_c);
         }
         {
           gh::Row r(b);
+          b.Select(&c.mode_color).text(F("один цвет;Новый год;градиент темп 1;градиент темп 2")).label(F("Режимы цветов")).size(2).attach(&flag_c);
           b.Select(&c.change_color).text(F("выключена;раз в минуту;каждые 10 минут;каждый час")).label(F("Смена цвета?")).attach(&flag_c);
           b.Select(&c.led_color).text(F("Amethyst;Aqua;Blue;Chartreuse;DarkGreen;DarkMagenta;DarkOrange;DeepPink;Fuchsia;Gold;GreenYellow;LightCoral;Tomato;Salmon;Red;Orchid")).label(F("Цвет часов")).attach(&flag_c);
         }
@@ -212,12 +223,13 @@ void build(gh::Builder& b) {
           gh::Row r(b);
           b.Spinner_("lis", &s.LEDS_IN_SEGMENT).label(F("СД в сегменте")).size(2).fontSize(15).range(1, 10, 1).attach(&flag_set);
           b.Spinner_("dn", &s.DOTS_NUM).label(F("СД точек")).size(2).fontSize(15).range(2, 8, 2).attach(&flag_set);
+          b.Select(&s.COLOR_ORDER).text(F("GRB;RGB")).label(F("Тип ленты")).size(2).attach(&flag_set);
         }
         {
           gh::Row r(b);
           b.Spinner_("dt", &s.DOT_TEMP).label(F("СД десятки температуры")).size(2).fontSize(15).range(0, 1, 1).attach(&flag_set);
-          b.Select(&s.COLOR_ORDER).text(F("GRB;RGB")).label(F("Тип ленты")).size(2).attach(&flag_set);
           b.SwitchIcon(&w.passInput).label(F("Пароль на вход")).fontSize(15).size(2).attach(&flag_set);
+          b.Select(&s.mode_udp).text(F("Выключены;Прием;Отправка")).label(F("Показания DS по UDP")).size(2).attach(&flag_set);
         }
         if (flag_set) _set.update();
       }

@@ -5,13 +5,20 @@ void ReadingSensors() {
   FtempH = (bmp280.readTemperature()) + o.cor_tempH;
   float pressure = bmp280.readPressure();
   Fpres = pressureToMmHg(pressure) + o.cor_pres;
-  if (c.htu21d) {
-    hum = htu.getHumidity() + o.cor_hum;
-  } else {
-    hum = bmp280.readHumidity() + o.cor_hum;
+  if (c.htu21d) hum = htu.getHumidity() + o.cor_hum;
+  if (!c.htu21d) hum = bmp280.readHumidity() + o.cor_hum;
+  if (c.radioDS) {
+    if (availableTempRX()) {
+      if (getAddrRX() == addrRadDS[c.radioAddrDS]) FtempS = getTempRX() + o.cor_tempS;
+      else getTempRX();
+    }
   }
-  if (timerDS) ds.requestTemp();
-  if (ds.readTemp()) FtempS = ds.getTemp() + o.cor_tempS;
+  if (!c.radioDS) {
+    if (timerDS) ds.requestTemp();
+    if (ds.readTemp()) FtempS = ds.getTemp() + o.cor_tempS;
+  }
+  if (s.mode_udp == 1) readUDP();
+  if (s.mode_udp == 2) sendUDP();
 }
 
 void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран

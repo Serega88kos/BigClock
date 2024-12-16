@@ -37,11 +37,15 @@ void wifi_connected() {
     Serial.println F("WiFi запущен");
     Serial.print("IP адрес: ");
     Serial.println(WiFi.localIP());
+    if (s.mode_udp != 0) {
+      Serial.printf("UDP server on port %d\n", localPort);
+      Udp.begin(localPort);
+    }
     NTP.setGMT(w.gmt);
     NTP.setHost(w.host);
     NTP.begin();
-    hub.onBuild(build);     // подключаем билдер
-    hub.begin();            // запускаем систему
+    hub.onBuild(build);  // подключаем билдер
+    hub.begin();         // запускаем систему
     rtcCheck();
   }
 }
