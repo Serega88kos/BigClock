@@ -39,10 +39,11 @@
 * DFPlayer mini для голосовых оповещений времени
 * модуль точного времени DS3231 (если нужен)
 * БП 5В
+* Радиодатчик на GPIO 13 https://community.alexgyver.ru/threads/radioudlinitel-datchika-temperatury-ds18b20.6173/
 
 ### Схемы
 
-* [Схемы](https://github.com/Serega88kos/BigClock/tree/main/schemes)
+* Схемы https://github.com/Serega88kos/BigClock/tree/main/schemes
 
 ### Возможности
 
