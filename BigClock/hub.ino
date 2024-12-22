@@ -228,7 +228,7 @@ void build(gh::Builder& b) {
         {
           gh::Row r(b);
           b.Spinner_("dt", &s.DOT_TEMP).label(F("СД десятки температуры")).size(2).fontSize(15).range(0, 1, 1).attach(&flag_set);
-          b.SwitchIcon(&w.passInput).label(F("Пароль на вход")).fontSize(15).size(2).attach(&flag_set);
+          b.SwitchIcon(&s.passInput).label(F("Пароль на вход")).fontSize(15).size(2).attach(&flag_set);
           b.Select(&s.mode_udp).text(F("Выключены;Прием;Отправка")).label(F("Показания DS по UDP")).size(2).attach(&flag_set);
         }
         if (flag_set) _set.update();

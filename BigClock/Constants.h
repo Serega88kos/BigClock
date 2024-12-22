@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define VF "Serega88kos/BigClock@3.0"  // версия прошивки
+#define VF "Serega88kos/BigClock@3.1"  // версия прошивки
 //////////// НАСТРОЙКИ ////////////
 //   питание платы от БП не выше 5В
 //   DS3231        SDA=>D2 SCL=>D1 питание с 5В БП или с 3.3В
@@ -31,7 +31,6 @@ struct Wifi {
   char pass[32] = "";              // пароль
   int gmt = 3;                     // часовой пояс, 3 для МСК
   char host[32] = "pool.ntp.org";  // NTP сервер
-  bool passInput = 0;              // установить пин-код для открытия устройства (значение больше 1000, не может начинаться с 000..)
 };
 Wifi w;
 
@@ -51,7 +50,7 @@ struct Clck {
   bool dotDate = 0;                       // точка для даты
   bool dotInv = 0;                        // сменить точку
   bool radioDS = 0;                       // модуль RADIO_DS18B20
-  uint8_t radioAddrDS = 0xAA;
+  uint8_t radioAddrDS = 0;
 };
 Clck c;
 
@@ -109,6 +108,7 @@ struct Settings {
   uint8_t DOTS_NUM = 2;         // кол-во СД в точках
   uint8_t DOT_TEMP = 0;         // только если есть дополнительный последний СД для точки десятичной температуры = 1
   uint8_t COLOR_ORDER = 0;      // тип ленты 0 = GRB, 1 = RGB
+  bool passInput = 0;           // установить пин-код для открытия устройства (значение больше 1000, не может начинаться с 000..)
   uint8_t mode_udp = 0;         // режим работы локального UDP для отправки показаний DS18B20
 };
 Settings s;

@@ -36,7 +36,7 @@ void TimeToArray() {    // вывод времени на экран
       cursor -= s.DOTS_NUM;
     }
     if ((i == 4) & (digit == 0)) {
-      if (!c.symbol) {           // проверка, включен ли ноль
+      if (!c.symbol) {              // проверка, включен ли ноль
         Digit(digits[12], cursor);  // если впереди ноль, то выключаем его, например 01:23 будет как 1:23
       } else {
         Digit(digits[0], cursor);  // иначе будет как 01:23
@@ -44,14 +44,17 @@ void TimeToArray() {    // вывод времени на экран
     } else {
       Digit(digits[digit], cursor);  // иначе показываем символ
     }
-
-    if (i == c.change_color) {  // как часто менять цвет
-      if (digit != last_digit) {
-        change_color_flag = true;
-        last_digit = digit;
+    if (!flag_night) {
+      if (i == c.change_color) {  // как часто менять цвет
+        if (digit != last_digit) {
+          change_color_flag = true;
+          last_digit = digit;
+        }
       }
     }
     Now /= 10;
-  };
-  if (change_color_flag) ledColor = ColorTable[random(16)];  // случайный цвет из таблицы
-};
+  }
+  if (!flag_night) {
+    if (change_color_flag) ledColor = ColorTable[random(16)];  // случайный цвет из таблицы
+  }
+}

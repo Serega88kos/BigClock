@@ -134,5 +134,5 @@ void loop() {
     static gh::Timer narMon(nm.delay * 1000);
     if (narMon) narodMonitor();
   }
-  if (w.passInput) hub.setPIN(passIn);
+  if (s.passInput) hub.setPIN(passIn);
 }
