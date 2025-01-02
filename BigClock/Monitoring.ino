@@ -17,16 +17,15 @@ void narodMonitor() {
 
 void sendUDP() {
   Udp.beginPacket("255.255.255.255", 8888);
-  Udp.print(FtempS);
+  Udp.print(String(FtempS) + '\0');
   Udp.endPacket();
   //Serial.println((String) + "sendUDP " + FtempS);
 }
 
 void readUDP() {
-  Udp.beginPacket("255.255.255.255", 8888);
   if (Udp.parsePacket()) {
     String str = "none";
-    str = Udp.readString();
+    str = Udp.readStringUntil('\0');
     FtempS = str.toFloat();
     //Serial.println((String) + "readUDP " + str + "toFloat " + FtempS);
   }
