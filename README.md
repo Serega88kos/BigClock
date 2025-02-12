@@ -31,8 +31,6 @@
 
 ![1](https://github.com/Serega88kos/Clock_ESP8266_WS2812_IOT/assets/57561983/47c1f3bc-1c69-47b9-8833-9de04428b040)
 ![2](https://github.com/Serega88kos/Clock_ESP8266_WS2812_IOT/assets/57561983/0b145928-88a9-4b65-932c-ddcf5330594d)
-![1](https://github.com/user-attachments/assets/da6333aa-8187-4548-92ab-ff3184345699)
-
 
 ### Железо
 
