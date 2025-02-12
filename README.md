@@ -15,12 +15,15 @@
     * GyverBME280
     * GyverHTU21D
     * GyverDS18
+    * GyverHTU21D
     * **FastLED 3.7.6**
     * **WebSockets 2.4.0**
     * **GSON 1.4.8**
+    * DHT sensor library
  * Вручную
     * DFPlayer https://github.com/enjoyneering/DFPlayer
     * GyverHub https://github.com/GyverLibs/GyverHub
+    * AHTxx https://github.com/enjoyneering/AHTxx
 
 ### Конфигурация 
 
