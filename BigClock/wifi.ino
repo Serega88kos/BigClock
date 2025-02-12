@@ -10,6 +10,9 @@ void wifi_connected() {
     Digit(digits[digit], segment_4);  // 4 сегмент
     digit = tries / 10;
     Digit(digits[digit], segment_3);  // 3 сегмент
+    Digit(digits[12], segment_2);     // 2 сегмент
+    Digit(digits[12], segment_1);     // 1 сегмент
+    FastLED.show();
     delay(1000);
   }
   if (WiFi.status() != WL_CONNECTED) {

@@ -1,27 +1,39 @@
 //////////// Функции опросов датчиков и их преобразования
-gh::Timer timerDS(10000);
 void ReadingSensors() {
-  if (c.htu21d) htu.readTick();
-  FtempH = (bmp280.readTemperature()) + o.cor_tempH;
-  float pressure = bmp280.readPressure();
-  Fpres = pressureToMmHg(pressure) + o.cor_pres;
-  if (c.htu21d) hum = htu.getHumidity() + o.cor_hum;
-  if (!c.htu21d) hum = bmp280.readHumidity() + o.cor_hum;
-  if (c.radioDS) {
+  //////////Дом. темп.
+  if (c.dsHome == 1) FtempH = bmp280.readTemperature() + o.cor_tempH;
+  if (c.dsHome == 2) {
+    htu.readTick();
+    FtempH = htu.getTemperature() + o.cor_tempH;
+  }
+  if (c.dsHome == 3) FtempH = dht.readTemperature() + o.cor_tempH;
+  if (c.dsHome == 4) FtempH = aht.readTemperature() + o.cor_tempH;
+  //////////Ул. темп.
+  if (c.dsStreet == 1) {
+    if (ds.readTemp()) FtempS = ds.getTemp() + o.cor_tempS;
+  }
+  if (c.dsStreet == 2) {
     if (availableTempRX()) {
       if (getAddrRX() == addrRadDS[c.radioAddrDS]) FtempS = getTempRX() + o.cor_tempS;
       else getTempRX();
     }
   }
-  if (!c.radioDS) {
-    if (timerDS) ds.requestTemp();
-    if (ds.readTemp()) FtempS = ds.getTemp() + o.cor_tempS;
+  //////////Давление
+  if (c.dsPrs == 1) Fpres = pressureToMmHg(bmp280.readPressure()) + o.cor_pres;
+  //////////Влажность
+  if (c.dsHum == 1) hum = bmp280.readHumidity() + o.cor_hum;
+  if (c.dsHum == 2) {
+    htu.readTick();
+    hum = htu.getHumidity() + o.cor_hum;
   }
+  if (c.dsHum == 3) hum = dht.readHumidity() + o.cor_hum;
+  if (c.dsHum == 4) hum = aht.readHumidity() + o.cor_hum;
+
   if (s.mode_udp == 1) readUDP();
   if (s.mode_udp == 2) sendUDP();
 }
 
-void TempToArray() {  // вывод температуры с датчика BMP/BME280 на экран
+void TempHomeToArray() {  // вывод температуры с датчика BMP/BME280 на экран
   if (s.DOT_TEMP == 1) {
     leds[NUM_LEDS - 1] = CRGB::Black;
   }

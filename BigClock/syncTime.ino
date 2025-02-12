@@ -1,7 +1,7 @@
 //////////// Функция синхронизации времени
-byte test = 0;
 void rtcCheck() {
-  if (c.rtc_check) {
+  byte test = 0;
+  if (c.rtc_check == 1) {
     WiFi.setAutoReconnect(true);
     NTP.updateNow();
     uint32_t ntpTime = NTP.getUnix();
@@ -18,7 +18,8 @@ void rtcCheck() {
       now.month = NTP.month();
       now.year = NTP.year();
       rtc.setTime(now);
-    } else {
+    }
+    if (ntpTime < 1609459200) {
       Serial.println("");
       Serial.println("Отказ в записи! Время получено неправильное!");
       test++;
@@ -31,7 +32,7 @@ void rtcCheck() {
     }
   }
 
-  if (!c.rtc_check) {
+  if (c.rtc_check == 0) {
     WiFi.setAutoReconnect(true);
     NTP.updateNow();
     uint32_t ntpTime = NTP.getUnix();
@@ -40,7 +41,8 @@ void rtcCheck() {
     if (ntpTime > 1609459200) {
       Serial.println("");
       Serial.println("Время верно!");
-    } else {
+    }
+    if (ntpTime < 1609459200) {
       Serial.println("");
       Serial.println("Время получено неправильное!");
       delay(5000);

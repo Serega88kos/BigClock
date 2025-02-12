@@ -1,5 +1,4 @@
 static byte mode;
-//gh::Timer timerMode(c.myTime[mode] * 1000);
 gh::Timer timerFastLED(500);
 void mod() {
   static uint32_t tmr;
@@ -14,7 +13,7 @@ void mod() {
     }
     switch (c.myMods[mode]) {
       case 1:
-        TempToArray();
+        TempHomeToArray();
         break;
       case 2:
         TempStreetToArray();

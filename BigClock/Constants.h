@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define VF "Serega88kos/BigClock@3.2"  // версия прошивки
+#define VF "Serega88kos/BigClock@3.3"  // версия прошивки
 //////////// НАСТРОЙКИ ////////////
 //   питание платы от БП не выше 5В
 //   DS3231        SDA=>D2 SCL=>D1 питание с 5В БП или с 3.3В
@@ -7,11 +7,12 @@
 //   DS18B20 питание 5В, если уличный без модуля ставим резистор между питанием и сигнальным на 4.7К
 
 #define ONE_SENSORS_DS D5  // PIN датчика ds18b20
-//#define COLOR_ORDER GRB    // тип ленты, поменять порядок GRB на свой тип, если неправильные цвета
-#define LED_PIN 6  // PIN дата от ленты, подключать через резистор 330Ом
+#define PINRX 13           // PIN радио-датчика
+#define DHTPIN D4          // PIN датчика DHT
+#define LED_PIN 6          // PIN дата от ленты, подключать через резистор 330Ом
 
 //Настройки для DFPlayer
-#define MP3_RX_PIN 2               //GPIO2/D4 к DFPlayer Mini TX
+#define MP3_RX_PIN 99              //GPIO2/D4 к DFPlayer Mini TX
 #define MP3_TX_PIN 16              //GPIO16/D0 к DFPlayer Mini RX
 #define MP3_SERIAL_SPEED 9600      //DFPlayer Mini поддерживает только 9600 бод
 #define MP3_SERIAL_BUFFER_SIZE 32  //размер последовательного буфера программного обеспечения в байтах, для отправки 8 байтов вам нужен 11-байтовый буфер (стартовый байт + 8 битов данных + байт четности + стоп-байт = 11 байтов)
@@ -35,22 +36,24 @@ struct Wifi {
 Wifi w;
 
 struct Clck {
-  bool rtc_check = 0;                     // 1 - есть модуль RTC, 0 - нет
+  uint8_t rtc_check = 0;                  // 1 - есть модуль RTC, 0 - нет
   uint8_t change_color = 0;               // смена цвета ( 0 - никогда, 1 - раз в минуту, 2 - каждые десять минут, 3 - каждый час, 4 - каждые десять часов)
   bool prs = 0;                           // 0 - не показываем символ давления, 1 - показать
   bool hmd = 1;                           // 0 - не показываем символ влажности, 1 - показать
   bool symbol = 0;                        // 0 - не показывать первый ноль в часах, 1 - показать
   bool mode_sec = 1;                      // режим мигания секунд, 0 - 1р/с, 1 - 2р/с
   uint8_t mode_color = 0;                 // режимы цветов)
-  bool htu21d = 0;                        // модуль htu21d
+  uint8_t dsHum = 0;                      // модуль влажности
   uint8_t myMods[9] = { 0, 1, 2, 3, 4 };  // режимы
   uint8_t myTime[9] = { 2, 2, 2, 2, 2 };  // время
-  int counter = 4;                        // счетчик
+  int counter = 4;                        // кол-во  режимов
   uint8_t led_color = 2;                  // основной цвет из таблицы
   bool dotDate = 0;                       // точка для даты
   bool dotInv = 0;                        // сменить точку
-  bool radioDS = 0;                       // модуль RADIO_DS18B20
-  uint8_t radioAddrDS = 0;
+  uint8_t dsStreet = 1;                   // датчик уличной температуры
+  uint8_t dsHome = 0;                     // датчик комнатной температуры
+  uint8_t dsPrs = 0;                      // датчик давления
+  uint8_t radioAddrDS = 0;                // радио-датчик уличной температуры
 };
 Clck c;
 

@@ -27,6 +27,10 @@ DFPlayer mp3;
 GyverBME280 bmp280;
 #include <GyverHTU21D.h>
 GyverHTU21D htu;
+#include "DHT.h"
+DHT dht(DHTPIN, DHT22);
+#include <AHTxx.h>
+AHTxx aht(AHTXX_ADDRESS_X38, AHT1x_SENSOR);
 #include <GyverDS18.h>
 GyverDS18Single ds(ONE_SENSORS_DS);
 
@@ -50,7 +54,7 @@ DEFINE_GRADIENT_PALETTE(Temperature){
 CRGBPalette256 myPalette = Temperature;
 
 DEFINE_GRADIENT_PALETTE(Temperature2){
-  00, 0, 0, 139,               //DarkBlue
+  0, 0, 0, 139,                //DarkBlue
   128 - 30 * 2, 138, 43, 255,  //BlueViolet
   128 - 20 * 2, 30, 144, 255,  //DodgerBlue
   128 - 10 * 2, 0, 255, 255,   //Aqua
@@ -76,7 +80,7 @@ uint16_t new_brg, pres, year, NUM_LEDS;
 float FtempH, FtempS, Fpres;
 CRGB* leds;
 unsigned int localPort = 8888;
-const uint8_t addrRadDS[] = {0xAA, 0xBB, 0xEE, 0xCC};  
+const uint8_t addrRadDS[] = { 0xAA, 0xBB, 0xEE, 0xCC };
 
 void setup() {
   Serial.begin(115200);
@@ -90,8 +94,10 @@ void setup() {
   FDstat_t stat4 = _narod.read();
   FDstat_t stat5 = _dfp.read();
   FDstat_t stat6 = _set.read();
-  if (c.htu21d) htu.begin();
   bmp280.begin();
+  htu.begin();
+  dht.begin();
+  aht.begin();
   NUM_LEDS = (s.LEDS_IN_SEGMENT * 28 + s.DOTS_NUM + s.DOT_TEMP);  // вычисляем кол-во светодиодов
   leds = new CRGB[NUM_LEDS];
   if (s.COLOR_ORDER == 0) FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);  // подключение ленты
@@ -105,8 +111,7 @@ void setup() {
   if (dfp.status_kuku) DFPlayer_setup();
   hub.onBuild(build);  // подключаем билдер
   hub.setVersion(VF);
-  initPinRX(13);
-  ReadingSensors();
+  initPinRX(PINRX);
 }
 
 void loop() {
@@ -116,7 +121,12 @@ void loop() {
   _narod.tick();
   _dfp.tick();
   _set.tick();
-  if (NTP.tick()) {  // новая секунда
+  NTP.tick();
+  hub.tick();
+  rtc.tick();
+  mod();
+  static gh::Timer sec(1000);
+  if (sec) {
     hub.update("FtempH").value(FtempH);
     hub.sendUpdate("time");
     hub.update("new_bright").value(new_brg);
@@ -126,13 +136,18 @@ void loop() {
     Brightness();
     ReadingSensors();
   }
+
   if (dfp.status_kuku) kuku_tick();
-  hub.tick();
-  rtc.tick();
-  mod();
+  
+  
   if (nm.Enable) {
     static gh::Timer narMon(nm.delay * 1000);
     if (narMon) narodMonitor();
   }
   if (s.passInput) hub.setPIN(passIn);
+
+  static gh::Timer timerDS(10000);
+  if (timerDS) {
+    ds.requestTemp();
+  }
 }
