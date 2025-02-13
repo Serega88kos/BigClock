@@ -74,6 +74,7 @@ struct Other {
   int night_brg = 10;       // яркость ночного режима
   uint8_t night_color = 2;  // цвет ночного режима
   bool night_time = 0;      // ночной режим
+  int light_night = 20;     // Яркость ниже которой включается ночной режим
 };
 Other o;
 

@@ -7,6 +7,7 @@ void wifi_connected() {
   while (--tries && WiFi.status() != WL_CONNECTED) {
     Serial.print F(".");
     int digit = tries % 10;
+    Dots(!Dot);
     Digit(digits[digit], segment_4);  // 4 сегмент
     digit = tries / 10;
     Digit(digits[digit], segment_3);  // 3 сегмент

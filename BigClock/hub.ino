@@ -154,6 +154,7 @@ void build(gh::Builder& b) {
             b.Space();
           }
           if (o.night_mode) b.Spinner(&o.night_brg).label(F("Яркость")).range(0, 20, 1).fontSize(15).attach(&flag_o);
+          if (o.night_mode) b.Spinner(&o.light_night).label(F("Откл. при ярк.")).range(0, 20, 1).fontSize(15).attach(&flag_o);
           if (o.night_mode) b.SwitchIcon(&o.night_time).label(F("Только часы")).fontSize(15).attach(&flag_o);
         }
         if (o.night_mode) {
