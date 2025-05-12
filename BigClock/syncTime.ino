@@ -1,56 +1,37 @@
-//////////// Функция синхронизации времени
-void rtcCheck() {
-  byte test = 0;
-  if (c.rtc_check == 1) {
-    WiFi.setAutoReconnect(true);
-    NTP.updateNow();
-    uint32_t ntpTime = NTP.getUnix();
-    Serial.println(ntpTime);
-    Serial.println(NTP.toString());
-    if (ntpTime > 1609459200) {
-      Serial.println("");
-      Serial.println("Время записано!");
-      Datime now;
-      now.hour = NTP.hour();
-      now.minute = NTP.minute();
-      now.second = NTP.second();
-      now.day = NTP.day();
-      now.month = NTP.month();
-      now.year = NTP.year();
-      rtc.setTime(now);
-    }
-    if (ntpTime < 1609459200) {
-      Serial.println("");
-      Serial.println("Отказ в записи! Время получено неправильное!");
-      test++;
-      delay(5000);
-      if (test == 4) {
-        test = 0;
-        return;
+void syncTime() {
+  const byte maxAttempts = 4;      // 4 попытки
+  static bool timeSynced = false;  // Флаг успешной синхронизации
+
+  if (timeSynced) return;  // Пропускаем если уже синхронизировано
+
+  for (byte attempt = 1; attempt <= maxAttempts; attempt++) {
+    Serial.println("Попытка синхронизации " + String(attempt));
+
+    if (NTP.updateNow() && NTP.getUnix() > 0) {  // Если время корректно
+      timeSynced = true;
+      Serial.println("Синхронизация успешна!");
+      Serial.println(NTP.toString());
+
+      if (o.rtc_check == 1) {  // Обновляем RTC
+        Datime now;
+        now.hour = NTP.hour();
+        now.minute = NTP.minute();
+        now.second = NTP.second();
+        now.day = NTP.day();
+        now.month = NTP.month();
+        now.year = NTP.year();
+
+        if (rtc.setTime(now)) Serial.println("RTC обновлён!");
+        else Serial.println("Ошибка записи в RTC!");
       }
-      rtcCheck();
+      return;  // Успех - выходим
+    }
+    if (attempt < maxAttempts) {
+      delay(5000);  // Пауза 5 сек между попытками
     }
   }
 
-  if (c.rtc_check == 0) {
-    WiFi.setAutoReconnect(true);
-    NTP.updateNow();
-    uint32_t ntpTime = NTP.getUnix();
-    Serial.println(NTP.getUnix());
-    Serial.println(NTP.toString());
-    if (ntpTime > 1609459200) {
-      Serial.println("");
-      Serial.println("Время верно!");
-    }
-    if (ntpTime < 1609459200) {
-      Serial.println("");
-      Serial.println("Время получено неправильное!");
-      delay(5000);
-      if (test == 4) {
-        test = 0;
-        return;
-      }
-      rtcCheck();
-    }
-  }
+  Serial.println("Ошибка синхронизации! Перезагрузка...");
+  delay(2000);
+  ESP.restart();
 }

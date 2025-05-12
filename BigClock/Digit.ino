@@ -33,7 +33,10 @@ uint8_t digits[] = {
   0b01000000,  // Символ -         13
   0b01111100,  // Символ P         14
   0b01111000,  // Символ % из двух частей 15
-  0b01000111   // Символ % из двух частей 16
+  0b01000111,  // Символ % из двух частей 16
+  0b01111101,  // Символ A         17
+  0b01111100   // Символ P         18
+
 };
 /////////////////////////////////////////////
 int d;
@@ -61,10 +64,16 @@ void DigitTempS(uint8_t digit, uint8_t cursor) {  // функция отобра
           leds[cursor] = (digit & mask) ? ColorTable[rand() % 16] : CRGB::Black;
           break;
         case 2:
-          leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette, 128 + tempS, 255, NOBLEND) : CRGB::Black;
+          leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette1, 128 + tempS, 255, NOBLEND) : CRGB::Black;
           break;
         case 3:
           leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette2, 128 + tempS, 255, NOBLEND) : CRGB::Black;
+          break;
+        case 4:
+          leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette3, 128 + tempS, 255, NOBLEND) : CRGB::Black;
+          break;
+        case 5:
+          leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette4, 128 + tempS, 255, NOBLEND) : CRGB::Black;
           break;
         default:
           leds[cursor] = (digit & mask) ? ledColor : CRGB::Black;
@@ -83,7 +92,7 @@ void DigitTempH(uint8_t digit, uint8_t cursor) {  // функция отобра
           leds[cursor] = (digit & mask) ? ColorTable[rand() % 16] : CRGB::Black;
           break;
         case 2:
-          leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette, 128 + tempH, 255, NOBLEND) : CRGB::Black;
+          leds[cursor] = (digit & mask) ? ColorFromPalette(myPalette1, 128 + tempH, 255, NOBLEND) : CRGB::Black;
           break;
         default:
           leds[cursor] = (digit & mask) ? ledColor : CRGB::Black;

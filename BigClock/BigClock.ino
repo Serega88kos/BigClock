@@ -1,6 +1,6 @@
 //Автор ASM
 //Обсуждение работы на форуме https://community.alexgyver.ru/threads/bolshie-chasy-na-ws2812-esp8266-narodnyj-monitoring.5067
-//Поблагодарить за труд, можно на Яндекс 410014148046232
+//Поблагодарить за труд, можно на ЮMoney 410014148046232
 #include "Constants.h"
 #include "RX.h"
 #include "ESP8266WiFi.h"
@@ -14,13 +14,13 @@ WiFiUDP Udp;
 #define GH_NO_MQTT  // MQTT
 #define GH_INCLUDE_PORTAL
 #include <GyverHub.h>
-GyverHub hub("MyDevices", "BigClock", "f017");
+GyverHub hub("MyDevices", "BigClockTest", "f017");
 #include <GyverDS3231.h>
 GyverDS3231 rtc;
 #include <SoftwareSerial.h>
-#include "DFPlayer.h"
-SoftwareSerial mp3Serial;
-DFPlayer mp3;
+#include "DFRobotDFPlayerMini.h"
+SoftwareSerial mp3Serial(MP3_RX_PIN, MP3_TX_PIN);
+DFRobotDFPlayerMini mp3;
 #include <FastLED.h>
 #include <Wire.h>
 #include <GyverBME280.h>
@@ -40,31 +40,7 @@ CRGB ColorTable[16] = {  // Таблица цветов
 };
 CRGB ledColor = ColorTable[c.led_color];
 
-DEFINE_GRADIENT_PALETTE(Temperature){
-  0, 0, 0, 139,                //DarkBlue
-  128 - 30 * 2, 0, 0, 255,     //Blue
-  128 - 20 * 2, 30, 144, 255,  //DodgerBlue
-  128 - 10 * 2, 0, 191, 255,   //DeepSkyBlue
-  128 + 0, 176, 224, 230,      //PowderBlue
-  128 + 10, 238, 232, 170,     //PaleGoldenrod
-  128 + 20, 255, 215, 0,       //Gold
-  128 + 30, 255, 165, 0,       //Orange
-  255, 255, 0, 0               //Red
-};
-CRGBPalette256 myPalette = Temperature;
-
-DEFINE_GRADIENT_PALETTE(Temperature2){
-  0, 0, 0, 139,                //DarkBlue
-  128 - 30 * 2, 138, 43, 255,  //BlueViolet
-  128 - 20 * 2, 30, 144, 255,  //DodgerBlue
-  128 - 10 * 2, 0, 255, 255,   //Aqua
-  128 + 0, 0, 250, 154,        //MediumSpringGreen
-  128 + 10, 0, 255, 0,         //Lime
-  128 + 20, 173, 255, 47,      //GreenYellow
-  128 + 30, 255, 165, 0,       //Orange
-  255, 255, 0, 0               //Red
-};
-CRGBPalette256 myPalette2 = Temperature2;
+#include "Gradient.h"
 
 FileData _wifi(&LittleFS, "/wifi.dat", 'A', &w, sizeof(w));
 FileData _clock(&LittleFS, "/clock.dat", 'A', &c, sizeof(c));
@@ -94,7 +70,8 @@ void setup() {
   FDstat_t stat4 = _narod.read();
   FDstat_t stat5 = _dfp.read();
   FDstat_t stat6 = _set.read();
-  bmp280.begin();
+  if (o.dsPrs == 1) bmp280.begin(0x76);
+  if (o.dsPrs == 2) bmp280.begin(0x77);
   htu.begin();
   dht.begin();
   aht.begin();
@@ -138,8 +115,8 @@ void loop() {
   }
 
   if (dfp.status_kuku) kuku_tick();
-  
-  
+
+
   if (nm.Enable) {
     static gh::Timer narMon(nm.delay * 1000);
     if (narMon) narodMonitor();

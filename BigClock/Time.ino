@@ -1,6 +1,6 @@
 //////////// Функция времени
 int GetTime() {
-  if (c.rtc_check == 1) {
+  if (o.rtc_check == 1) {
     Datime now = rtc.getTime();
     hour = now.hour;
     minute = now.minute;

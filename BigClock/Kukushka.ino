@@ -15,7 +15,7 @@ void kuku_tick() {
       if (minute == 59 && flag_kuku == 0) {
         flag_kuku = 1;
       }
-      mp3.setVolume(dfp.grom_mp3);
+      mp3.volume(dfp.grom_mp3);
       Vremy();
       Utro();
       Vecher();
@@ -49,38 +49,16 @@ void kuku_tick() {
    EspSoftwareSerial -  https://github.com/plerup/espsoftwareserial
 */
 /***************************************************************************************************/
-DFPLAYER_MODULE_TYPE board;
+
 void DFPlayer_setup() {
-  switch (dfp.board) {
-    case 1:
-      board = DFPLAYER_FN_X10P;
-      break;
-    case 2:
-      board = DFPLAYER_HW_247A;
-      break;
-    case 3:
-      board = DFPLAYER_NO_CHECKSUM;
-      break;
-    default:
-      board = DFPLAYER_MINI;
-      break;
-  }
-
-  Serial.println("Инициализация DFPlayedfp... (может занять 3~5 секунд)");                                    //для отладки
-  mp3Serial.begin(MP3_SERIAL_SPEED, SWSERIAL_8N1, MP3_RX_PIN, MP3_TX_PIN, false, MP3_SERIAL_BUFFER_SIZE, 0);  //false=сигнал не инвертирован, 0=размер буфера ISR/RX (общий с последовательным буфером TX)
-  mp3.begin(mp3Serial, MP3_SERIAL_TIMEOUT, board, false);                                                     //"DFPLAYER_HW_247A" см. ПРИМЕЧАНИЕ, false = нет обратной связи от модуля после команды
-  mp3.stop();                                                                                                 //если плеер работал во время перезагрузки ESP8266
-  mp3.reset();                                                                                                //сбросить все настройки по умолчанию
-  mp3.setSource(2);                                                                                           //1=USB-диск, 2=TF-карта, 3=Aux, 4=спящий режим, 5=NOR Flash
-  mp3.setEQ(0);                                                                                               //0=Выкл., 1=Поп, 2=Рок, 3=Джаз, 4=Классика, 5=Бас
-  mp3.setVolume(dfp.grom_mp3);                                                                                //0..30, модуль сохраняет громкость при сбое питания
-
-  Serial.print(" ♫ Громкость: ");   //для отладки, Получить громкость
-  Serial.println(mp3.getVolume());  //0..30
-
+  Serial.println("Инициализация DFPlayedfp... (может занять 3~5 секунд)");  //для отладки
+  mp3Serial.begin(9600);
+  mp3.begin(mp3Serial, /*isACK = */ true, /*doReset = */ true);  
+  mp3.stop();                                                    //если плеер работал во время перезагрузки ESP8266
+  mp3.reset();                                                   //сбросить все настройки по умолчанию
+  mp3.volume(dfp.grom_mp3);                                      //0..30, модуль сохраняет громкость при сбое питания
   mp3Serial.enableRx(false);  //отключить прерывания на RX-контакте, меньше накладных расходов, чем mp3Serial.listen()
-
-  mp3.playMP3Folder(26);
+  mp3.play(27);
   Serial.println(" ♫ Приветствие");  // Музыкальное приветствие
 }
 
@@ -88,7 +66,7 @@ void DFPlayer() {              // Функция срабатывающая ра
   if (dfp.status_kuku) {       // Если кукушка включена(проверка второй раз для корректной работы портала)
     if (dfp.kuku_mp3_check) {  // Если включено воспроизведение кукушки
       Serial.println(" ♫ Ку-Ку");
-      mp3.playMP3Folder(25);  // проигрываем файл c кукушкой
+      mp3.play(26);  // проигрываем файл c кукушкой
     }
     if (dfp.vrem_mp3_check) Vremy_flag = 1;
   }
@@ -105,7 +83,7 @@ void Vremy() {
 
     // mp3.playMP3Folder((dfp.golos * 100) + (hour) ? hour : 24);
     // mp3.playMP3Folder(hour ? (hour + dfp.golos * 100) : (24 + dfp.golos * 100));
-    mp3.playMP3Folder((dfp.golos * 100) + hour + 1);
+    mp3.play((dfp.golos * 30) + hour + 2);
     Serial.println((String) " ♫ " + hour + " часов");
 
     if (hour == dfp.start_kuku) Utro_flag = 1;
@@ -122,7 +100,7 @@ void Utro() {
     Utro_flag = 0;
   }
   if (Utro_play_flag == 1 && (millis() - utroTime) >= 3000) {  // Пауза чтобы выговорилось время
-    mp3.playMP3Folder((dfp.golos * 100) + 27);
+    mp3.play((dfp.golos * 30) + 28);
     Serial.println(" ♫ Доброе утро");  //для отладки
     Utro_play_flag = 0;
   }
@@ -135,7 +113,7 @@ void Vecher() {
     Vecher_flag = 0;
   }
   if (Vecher_play_flag == 1 && (millis() - VecherTime) >= 3000) {  // Пауза чтобы выговорилось время
-    mp3.playMP3Folder((dfp.golos * 100) + 28);
+    mp3.play((dfp.golos * 30) + 29);
     Serial.println(" ♫ Доброй ночи");  //для отладки
     Vecher_play_flag = 0;
   }

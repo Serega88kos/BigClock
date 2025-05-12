@@ -1,7 +1,7 @@
 void build(gh::Builder& b) {
   {
     GH::Row r(b);
-    b.Tabs(&tab).text(F("Главная;Часы;Другие;Мониторинг;Плеер;Настройки")).noLabel().click();
+    b.Tabs(&tab).text(F("Главная;Часы;Датчики;Мониторинг;Плеер;Настройки")).noLabel().click();
     if (b.changed()) b.refresh();
   }
   switch (tab) {
@@ -30,7 +30,9 @@ void build(gh::Builder& b) {
         }
         if (flag_w) {
           _wifi.update();
-          NTP.begin(w.gmt);
+          NTP.setGMT(w.gmt);
+          NTP.setHost(w.host);
+          NTP.begin();
         }
       }
       break;
@@ -40,46 +42,55 @@ void build(gh::Builder& b) {
         bool flag_c = 0, flag_sync = 0;
         {
           gh::Row r(b);
-          if (c.rtc_check == 0) b.Label_("time", NTP.toString()).noLabel().fontSize(20).size(3);
-          if (c.rtc_check == 1) b.Label_("time", rtc.toString()).noLabel().fontSize(20).size(3);
+          if (o.rtc_check == 0) b.Label_("time", NTP.toString()).noLabel().fontSize(20).size(3);
+          if (o.rtc_check == 1) b.Label_("time", rtc.toString()).noLabel().fontSize(20).size(3);
           b.Button_("btnn").icon("f0e2").noLabel().size(1).fontSize(20).attach(&flag_sync);
-          if (flag_sync) rtcCheck();
+          if (flag_sync) syncTime();
         }
         b.Title(F("Настройки часов")).fontSize(20);
+
         {
           gh::Row r(b);
-          b.Select(&c.rtc_check).text(F("Выкл;Вкл")).label(F("Модуль RTC")).fontSize(15).size(1).attach(&flag_c);
-          b.Select(&c.dsStreet).text(F("Выкл;ds18b20;radioDS")).label(F("Ул. темп.")).fontSize(15).size(1).attach(&flag_c);
-          b.Select(&c.dsHome).text(F("Выкл;BME;HTU21D;DHT22;AHT")).label(F("Комн. темп.")).fontSize(15).size(1).attach(&flag_c);
-        }
-        {
-          gh::Row r(b);
-          b.Select(&c.dsHum).text(F("Выкл;BME;HTU21D;DHT22;AHT")).label(F("Влажность")).fontSize(15).size(1).attach(&flag_c);
-          b.Select(&c.dsPrs).text(F("Выкл;BME")).label(F("Давление")).fontSize(15).size(1).attach(&flag_c);
-          if (c.dsStreet == 2) b.Select(&c.radioAddrDS).text(F("0xAA;0xBB;0xEE;0xCC")).label(F("Адрес radioDS")).size(1).attach(&flag_c);
-        }
-        {
-          gh::Row r(b);
-          b.Select(&c.mode_color).text(F("один цвет;Новый год;градиент темп 1;градиент темп 2")).label(F("Режимы цветов")).size(2).attach(&flag_c);
+          b.Select(&c.mode_color).text(F("один цвет;Новый год;градиент темп 1;градиент темп 2;градиент темп 3;градиент темп 4")).label(F("Режимы цветов")).size(2).attach(&flag_c);
           b.Select(&c.change_color).text(F("выключена;раз в минуту;каждые 10 минут;каждый час")).label(F("Смена цвета?")).attach(&flag_c);
           b.Select(&c.led_color).text(F("Amethyst;Aqua;Blue;Chartreuse;DarkGreen;DarkMagenta;DarkOrange;DeepPink;Fuchsia;Gold;GreenYellow;LightCoral;Tomato;Salmon;Red;Orchid")).label(F("Цвет часов")).attach(&flag_c);
         }
         {
           gh::Row r(b);
+          if (!c.night_mode) b.SwitchIcon(&c.night_mode).label(F("Ночной режим")).fontSize(15).attach(&flag_c);
+          b.SwitchIcon(&c.enableAnimation).label(F("Анимация")).fontSize(15).attach(&flag_c);
+          if (c.enableAnimation) b.Spinner(&c.animationSpeed).label(F("Скорость анимации")).range(100, 2000, 100).fontSize(15).attach(&flag_c);
+        }
+        if (c.night_mode) {
+          b.Title(F("Ночной режим")).fontSize(20);
+          {
+            gh::Row r(b);
+            b.SwitchIcon(&c.night_mode).label(F("Включен")).fontSize(15).attach(&flag_c);
+            b.Spinner(&c.night_brg).label(F("Яркость")).range(0, 50, 1).fontSize(15).attach(&flag_c);
+            b.Spinner(&c.light_night).label(F("Откл. при ярк.")).range(0, 100, 1).fontSize(15).attach(&flag_c);
+            b.SwitchIcon(&c.night_time).label(F("Только часы")).fontSize(15).attach(&flag_c);
+          }
+          {
+            gh::Row r(b);
+            b.Select(&c.start_night).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Включить в")).fontSize(20).attach(&flag_c);
+            b.Select(&c.stop_night).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Выключить в")).fontSize(20).attach(&flag_c);
+            b.Select(&c.night_color).text(F("Amethyst;Aqua;Blue;Chartreuse;DarkGreen;DarkMagenta;DarkOrange;DeepPink;Fuchsia;Gold;GreenYellow;LightCoral;Tomato;Salmon;Red;Orchid")).label(F("Цвет часов")).attach(&flag_c);
+          }
         }
         b.Title(F("Символы")).fontSize(20);
         {
           gh::Row r(b);
           b.SwitchIcon(&c.prs).label(F("Давления")).fontSize(15).attach(&flag_c);
           b.SwitchIcon(&c.hmd).label(F("Влажности")).fontSize(15).attach(&flag_c);
-          b.SwitchIcon(&c.symbol).label(F("Первый ноль в часах")).fontSize(15).attach(&flag_c);
+          b.SwitchIcon(&c.celsius).label(F("Цельсия")).fontSize(15).attach(&flag_c);
         }
         {
           gh::Row r(b);
+          b.SwitchIcon(&c.symbol).label(F("Первый ноль в часах")).fontSize(15).attach(&flag_c);
           if (!c.mode_sec) b.SwitchIcon(&c.mode_sec).label(F("Точки 1 р/с")).fontSize(15).attach(&flag_c);
           if (c.mode_sec) b.SwitchIcon(&c.mode_sec).label(F("Точки 2 р/с")).fontSize(15).attach(&flag_c);
           b.SwitchIcon(&c.dotDate).label(F("Точка даты")).fontSize(15).attach(&flag_c);
-          b.SwitchIcon(&c.dotInv).label(F("Сменить точку")).fontSize(15).attach(&flag_c);
+          if (c.dotDate) b.SwitchIcon(&c.dotInv).label(F("Сменить точку")).fontSize(15).attach(&flag_c);
         }
         if (flag_c) {
           _clock.update();
@@ -94,7 +105,7 @@ void build(gh::Builder& b) {
           b.Space().size(2);
           if (flag_modes) b.refresh();
         }
-        b.Title("");
+        //b.Title("");
         for (int i = 0; i < c.counter; i++) {
           {
             gh::Row r(b);
@@ -113,7 +124,6 @@ void build(gh::Builder& b) {
     case 2:
       {
         bool flag_o = 0;
-        b.Title(F("Настройка датчика")).fontSize(20);
         {
           gh::Row r(b);
           b.SwitchIcon(&o.auto_brg).label(F("Автояркость")).fontSize(15).attach(&flag_o);
@@ -127,6 +137,19 @@ void build(gh::Builder& b) {
           b.Spinner(&o.min_brg).label(F("Минимальная")).range(0, o.max_brg - 1, 1).fontSize(15).attach(&flag_o);
           b.Spinner(&o.max_brg).label(F("Максимальная")).range(o.min_brg + 1, 255, 1).fontSize(15).attach(&flag_o);
           b.Spinner(&o.brg).label(F("Задержка, в сек.")).range(0, 30, 1).fontSize(15).attach(&flag_o);
+        }
+        b.Title(F("Выбор датчиков")).fontSize(20);
+        {
+          gh::Row r(b);
+          b.Select(&o.rtc_check).text(F("Выкл;Вкл")).label(F("Модуль RTC")).fontSize(15).size(1).attach(&flag_o);
+          b.Select(&o.dsStreet).text(F("Выкл;ds18b20;radioDS")).label(F("Ул. темп.")).fontSize(15).size(1).attach(&flag_o);
+          if (o.dsStreet == 2) b.Select(&c.radioAddrDS).text(F("0xAA;0xBB;0xEE;0xCC")).label(F("Адрес radioDS")).size(1).attach(&flag_o);
+        }
+        {
+          gh::Row r(b);
+          b.Select(&o.dsPrs).text(F("Выкл;0x76;0x77")).label(F("Адрес BMP/E")).fontSize(15).size(1).attach(&flag_o);
+          b.Select(&o.dsHome).text(F("Выкл;BMP/E 280;HTU21D;DHT22;AHT")).label(F("Комн. темп.")).fontSize(15).size(1).attach(&flag_o);
+          b.Select(&o.dsHum).text(F("Выкл;BME280;HTU21D;DHT22;AHT")).label(F("Влажность")).fontSize(15).size(1).attach(&flag_o);
         }
         b.Title(F("Корректировка показаний")).fontSize(20);
         {
@@ -143,31 +166,11 @@ void build(gh::Builder& b) {
           b.Label_("hum", String(hum)).label(F("Влажность")).fontSize(20);
           b.Spinner(&o.cor_hum).noLabel().range(-9, 9, 1).fontSize(15).attach(&flag_o);
         }
-        b.Title(F("Ночной режим")).fontSize(20);
-        {
-          gh::Row r(b);
-          if (o.night_mode) b.SwitchIcon(&o.night_mode).label(F("Включен")).fontSize(15).attach(&flag_o);
-          if (!o.night_mode) {
-            b.SwitchIcon(&o.night_mode).label(F("Выключен")).fontSize(15).attach(&flag_o);
-            b.Space();
-            b.Space();
-            b.Space();
-          }
-          if (o.night_mode) b.Spinner(&o.night_brg).label(F("Яркость")).range(0, 20, 1).fontSize(15).attach(&flag_o);
-          if (o.night_mode) b.Spinner(&o.light_night).label(F("Откл. при ярк.")).range(0, 20, 1).fontSize(15).attach(&flag_o);
-          if (o.night_mode) b.SwitchIcon(&o.night_time).label(F("Только часы")).fontSize(15).attach(&flag_o);
-        }
-        if (o.night_mode) {
-          {
-            gh::Row r(b);
-            b.Select(&o.start_night).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Включить в")).fontSize(20).attach(&flag_o);
-            b.Select(&o.stop_night).text(F("0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23")).label(F("Выключить в")).fontSize(20).attach(&flag_o);
-            b.Select(&o.night_color).text(F("Amethyst;Aqua;Blue;Chartreuse;DarkGreen;DarkMagenta;DarkOrange;DeepPink;Fuchsia;Gold;GreenYellow;LightCoral;Tomato;Salmon;Red;Orchid")).label(F("Цвет часов")).attach(&flag_o);
-          }
-        }
 
         if (flag_o) {
           _other.update();
+          if (o.dsPrs == 1) bmp280.begin(0x76);
+          if (o.dsPrs == 2) bmp280.begin(0x77);
           b.refresh();
         }
       }
@@ -203,7 +206,6 @@ void build(gh::Builder& b) {
         bool flag_dfp = 0, flag_test_dfp = 0, flag_dfp_vol = 0;
         {
           gh::Row r(b);
-          b.Select(&dfp.board).text(F("DFPLAYER_MINI;DFPLAYER_FN_X10P;DFPLAYER_HW_247A;DFPLAYER_NO_CHECKSUM")).label(F("Тип платы")).size(2).attach(&flag_dfp);
           if (dfp.status_kuku) b.SwitchIcon(&dfp.status_kuku).label(F("Включен")).fontSize(15).size(1).attach(&flag_dfp);
           if (!dfp.status_kuku) b.SwitchIcon(&dfp.status_kuku).label(F("Выключен")).fontSize(15).size(1).attach(&flag_dfp);
           if (dfp.status_kuku) b.Button_("btnTest").label(F("Тест")).fontSize(20).icon("f04b").size(1).attach(&flag_test_dfp);
@@ -227,12 +229,13 @@ void build(gh::Builder& b) {
         if (flag_dfp) {
           _dfp.update();
           b.refresh();
+          DFPlayer_setup();
         }
         if (flag_test_dfp) {
-          mp3.setVolume(dfp.grom_mp3);
-          mp3.playMP3Folder((dfp.golos * 100) + hour + 1);
+          mp3.volume(dfp.grom_mp3);
+          mp3.play((dfp.golos * 30) + hour + 2);
         }
-        if (flag_dfp_vol) mp3.setVolume(dfp.grom_mp3);
+        if (flag_dfp_vol) mp3.volume(dfp.grom_mp3);
       }
       break;
 
@@ -250,7 +253,11 @@ void build(gh::Builder& b) {
           gh::Row r(b);
           b.Spinner_("dt", &s.DOT_TEMP).label(F("СД десятки температуры")).size(2).fontSize(15).range(0, 1, 1).attach(&flag_set);
           b.SwitchIcon(&s.passInput).label(F("Пароль на вход")).fontSize(15).size(2).attach(&flag_set);
+        }
+        {
+          gh::Row r(b);
           b.Select(&s.mode_udp).text(F("Выключены;Прием;Отправка")).label(F("Показания DS по UDP")).size(2).attach(&flag_set);
+          b.SwitchIcon(&s.rndTemp).label("Округление температуры").fontSize(15).size(2).attach(&flag_set);
         }
         if (flag_set) _set.update();
       }
