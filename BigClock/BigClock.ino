@@ -14,7 +14,7 @@ WiFiUDP Udp;
 #define GH_NO_MQTT  // MQTT
 #define GH_INCLUDE_PORTAL
 #include <GyverHub.h>
-GyverHub hub("MyDevices", "BigClockTest", "f017");
+GyverHub hub("MyDevices", "BigClock", "f017");
 #include <GyverDS3231.h>
 GyverDS3231 rtc;
 #include <SoftwareSerial.h>
